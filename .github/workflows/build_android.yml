@@ -1,0 +1,51 @@
+name: Build Android
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.x'
+          channel: 'stable'
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Build AAB
+        run: flutter build appbundle --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.apk
+          path: build/app/outputs/apk/release/app-release.apk
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload to Firebase App Distribution
+        if: success()
+        run: |
+          echo "Firebase App Distribution upload placeholder"
+          echo "Requires: FIREBASE_CLI_TOKEN secret"
+          # firebase appdistribution:distribute build/app/outputs/apk/release/app-release.apk \
+          #   --app 1:XXXXXXXXXX:android:XXXXXXXXXXXXXXXX \
+          #   --release-notes-file RELEASE_NOTES.txt

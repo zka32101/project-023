@@ -1,0 +1,10 @@
+{
+  "android": null,
+  "ios": null,
+  "project_info": {
+    "app_type": "utility",
+    "has_firebase": true,
+    "has_sentry": false,
+    "has_ads": false
+  }
+}

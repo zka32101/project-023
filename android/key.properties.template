@@ -1,0 +1,22 @@
+# つくアニ Android Release Signing Configuration
+# このファイルは git に commit しないでください（.gitignore に含める）
+
+# キーストアのパスワード（create-keystore.ps1 で設定したもの）
+storePassword=YOUR_STORE_PASSWORD
+
+# キーのパスワード（通常は storePassword と同じ）
+keyPassword=YOUR_KEY_PASSWORD
+
+# キーのエイリアス（デフォルト: tsukuani）
+keyAlias=tsukuani
+
+# キーストアファイルのパス
+# Windows 例: C:\Users\YourName\.android\tsukuani-release-keystore.jks
+# macOS/Linux 例: /Users/YourName/.android/tsukuani-release-keystore.jks
+storeFile=YOUR_KEYSTORE_PATH
+
+# 設定例（Windows）:
+# storePassword=MySecurePassword123
+# keyPassword=MySecurePassword123
+# keyAlias=tsukuani
+# storeFile=C:\Users\Administrator\.android\tsukuani-release-keystore.jks

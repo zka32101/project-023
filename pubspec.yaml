@@ -1,0 +1,96 @@
+name: tsukuani
+description: "つくアニ — AR動画クリエーター・親子で作る。Flutter + Firebase + ARKit/ARCore."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  riverpod: ^2.4.0
+  flutter_riverpod: ^2.4.0
+
+  # Firebase
+  firebase_core: ^2.24.0
+  firebase_analytics: ^10.7.0
+  firebase_crashlytics: ^3.4.0
+  cloud_firestore: ^4.13.0
+  firebase_auth: ^4.15.0
+  firebase_remote_config: ^4.3.0
+  firebase_storage: ^11.6.0
+
+  # Camera (ライブカメラ + キャラクターオーバーレイ方式)
+  camera: ^0.10.5+9
+
+  # Video Processing
+  ffmpeg_kit_flutter: ^5.1.0
+
+  # Purchases / RevenueCat
+  purchases_flutter: ^7.0.0
+
+  # Animations
+  lottie: ^2.6.0
+
+  # Image & Media
+  image_picker: ^1.0.0
+  cached_network_image: ^3.3.0
+  video_player: ^2.8.0
+  image_gallery_saver: ^2.0.3
+  share_plus: ^10.0.0
+  record: ^5.1.2
+
+  # Local Storage
+  hive: ^2.2.0
+  path_provider: ^2.1.0
+  shared_preferences: ^2.2.0
+
+  # Networking
+  http: ^1.1.0
+  dio: ^5.3.0
+
+  # Permissions
+  permission_handler: ^11.4.0
+
+  # Logging
+  logger: ^2.0.0
+
+  # UI
+  google_fonts: ^6.1.0
+
+  # Haptics
+  vibration: ^1.8.3
+
+
+  # Utils
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  riverpod_generator: ^2.3.0
+  build_runner: ^2.4.0
+  flutter_lints: ^2.0.0
+
+  # Testing
+  integration_test:
+    sdk: flutter
+
+dependency_overrides:
+  # path_provider_foundation 2.6+ uses objective_c ^9 which has Dart hooks
+  # that fail on Google Drive paths. Pin to a hooks-free version.
+  path_provider_foundation: ">=2.4.0 <2.5.0"
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/animations/
+    - assets/ar_models/
+    - assets/images/
+    - assets/data/characters.json

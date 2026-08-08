@@ -1,0 +1,134 @@
+{
+  "characters": [
+    {
+      "characterId": "char_001",
+      "name": "虎",
+      "model3dUrl": "assets/ar_models/char_001.usdz",
+      "thumbnailUrl": "assets/images/char_001.png",
+      "category": "animal",
+      "packId": "free",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_002",
+      "name": "猫",
+      "model3dUrl": "assets/ar_models/char_002.usdz",
+      "thumbnailUrl": "assets/images/char_002.png",
+      "category": "animal",
+      "packId": "free",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_003",
+      "name": "狐",
+      "model3dUrl": "assets/ar_models/char_003.usdz",
+      "thumbnailUrl": "assets/images/char_003.png",
+      "category": "animal",
+      "packId": "free",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_004",
+      "name": "鳥",
+      "model3dUrl": "assets/ar_models/char_004.usdz",
+      "thumbnailUrl": "assets/images/char_004.png",
+      "category": "animal",
+      "packId": "free",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_005",
+      "name": "龍",
+      "model3dUrl": "assets/ar_models/char_005.usdz",
+      "thumbnailUrl": "assets/images/char_005.png",
+      "category": "mythical",
+      "packId": "free",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_006",
+      "name": "ユニコーン",
+      "model3dUrl": "assets/ar_models/char_006.usdz",
+      "thumbnailUrl": "assets/images/char_006.png",
+      "category": "mythical",
+      "packId": "pack_01",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_007",
+      "name": "フェニックス",
+      "model3dUrl": "assets/ar_models/char_007.usdz",
+      "thumbnailUrl": "assets/images/char_007.png",
+      "category": "mythical",
+      "packId": "pack_01",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_008",
+      "name": "ロボット",
+      "model3dUrl": "assets/ar_models/char_008.usdz",
+      "thumbnailUrl": "assets/images/char_008.png",
+      "category": "object",
+      "packId": "pack_01",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_009",
+      "name": "宇宙人",
+      "model3dUrl": "assets/ar_models/char_009.usdz",
+      "thumbnailUrl": "assets/images/char_009.png",
+      "category": "object",
+      "packId": "pack_02",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    },
+    {
+      "characterId": "char_010",
+      "name": "恐竜",
+      "model3dUrl": "assets/ar_models/char_010.usdz",
+      "thumbnailUrl": "assets/images/char_010.png",
+      "category": "animal",
+      "packId": "pack_02",
+      "animations": {
+        "idle": "idle",
+        "move": "move",
+        "celebrate": "celebrate"
+      }
+    }
+  ]
+}

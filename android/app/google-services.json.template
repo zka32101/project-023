@@ -1,0 +1,20 @@
+{
+  "type": "service_account",
+  "project_id": "tsukuani-firebase-project",
+  "private_key_id": "YOUR_PRIVATE_KEY_ID",
+  "private_key": "YOUR_PRIVATE_KEY",
+  "client_email": "firebase-adminsdk@tsukuani-firebase-project.iam.gserviceaccount.com",
+  "client_id": "YOUR_CLIENT_ID",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "YOUR_CERT_URL",
+  "firebase": {
+    "project_id": "tsukuani-firebase-project",
+    "app_id": "1:123456789012:android:abc123def456ghi789jkl",
+    "api_key": "AIzaSyD_YOUR_API_KEY_HERE_REPLACE_WITH_ACTUAL",
+    "database_url": "https://tsukuani-firebase-project.firebaseio.com",
+    "storage_bucket": "tsukuani-firebase-project.appspot.com",
+    "messaging_sender_id": "123456789012"
+  }
+}
