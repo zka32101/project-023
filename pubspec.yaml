@@ -1,5 +1,4 @@
-name: tsukuani
-description: "つくアニ — AR動画クリエーター・親子で作る。Flutter + Firebase + ARKit/ARCore."
+﻿name: tsukuani
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -94,3 +93,4 @@ flutter:
     - assets/ar_models/
     - assets/images/
     - assets/data/characters.json
+
