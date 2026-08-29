@@ -90,8 +90,9 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/animations/
-    - assets/ar_models/
-    - assets/images/
+    # TODO: Create these directories or remove if not needed
+    # - assets/animations/
+    # - assets/ar_models/
+    # - assets/images/
     - assets/data/characters.json
 

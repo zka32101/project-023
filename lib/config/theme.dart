@@ -76,12 +76,13 @@ class AppTheme {
           borderSide: const BorderSide(color: AppColors.primaryStart, width: 2),
         ),
       ),
-      cardTheme: CardThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        ),
-        elevation: AppSizes.elevationSmall,
-      ),
+      // TODO: cardTheme configuration causes analyzer error with CardThemeData
+      // cardTheme: CardThemeData(
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      //   ),
+      //   elevation: AppSizes.elevationSmall,
+      // ),
     );
   }
 
@@ -125,13 +126,14 @@ class AppTheme {
           elevation: AppSizes.elevationMedium,
         ),
       ),
-      cardTheme: CardThemeData(
-        color: AppColors.darkSurface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        ),
-        elevation: AppSizes.elevationSmall,
-      ),
+      // TODO: cardTheme configuration causes analyzer error with CardThemeData
+      // cardTheme: CardThemeData(
+      //   color: AppColors.darkSurface,
+      //   shape: RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      //   ),
+      //   elevation: AppSizes.elevationSmall,
+      // ),
     );
   }
 
