@@ -8,6 +8,7 @@ import '../config/constants.dart';
 import '../models/custom_character.dart';
 import '../services/background_removal_service.dart';
 import '../utils/logger.dart';
+import 'manual_cutout_screen.dart';
 
 class BackgroundRemovalScreen extends ConsumerStatefulWidget {
   const BackgroundRemovalScreen({Key? key}) : super(key: key);
@@ -51,32 +52,49 @@ class _BackgroundRemovalScreenState
       return;
     }
 
-    setState(() => _isProcessing = true);
     try {
       final imageBytes = await _selectedImage!.readAsBytes();
 
-      Uint8List? result;
       if (_selectedMethod == 'white') {
-        result = await BackgroundRemovalService.removeWhiteBackground(
-          imageBytes,
-          threshold: 200,
-          tolerance: 30,
-        );
-      }
+        // L1: 自動処理
+        setState(() => _isProcessing = true);
+        try {
+          final result =
+              await BackgroundRemovalService.removeWhiteBackground(
+            imageBytes,
+            threshold: 200,
+            tolerance: 30,
+          );
 
-      if (result == null) {
-        _showError('背景切り抜きに失敗しました');
-        return;
-      }
+          if (result == null) {
+            _showError('背景切り抜きに失敗しました');
+            return;
+          }
 
-      setState(() {
-        _processedImage = result;
-        _errorMessage = null;
-      });
+          setState(() {
+            _processedImage = result;
+            _errorMessage = null;
+          });
+        } finally {
+          setState(() => _isProcessing = false);
+        }
+      } else if (_selectedMethod == 'manual') {
+        // L2: マニュアル切り抜きへ遷移
+        if (mounted) {
+          final result = await Navigator.push<CustomCharacter>(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ManualCutoutScreen(imageBytes: imageBytes),
+            ),
+          );
+
+          if (result != null && mounted) {
+            Navigator.pop(context, result);
+          }
+        }
+      }
     } catch (e) {
       _showError('処理中にエラーが発生しました: $e');
-    } finally {
-      setState(() => _isProcessing = false);
     }
   }
 
@@ -288,7 +306,7 @@ class _BackgroundRemovalScreenState
           const SizedBox(height: AppSizes.sm),
           RadioListTile<String>(
             title: const Text(
-              '自動（白背景のみ対応）',
+              '自動（白背景削除）',
               style: TextStyle(color: Colors.white),
             ),
             subtitle: const Text(
@@ -300,10 +318,20 @@ class _BackgroundRemovalScreenState
             onChanged: (val) => setState(() => _selectedMethod = val ?? 'white'),
             activeColor: AppColors.accent,
           ),
-          const SizedBox(height: AppSizes.sm),
-          Text(
-            'マニュアル切り抜きは Phase 22.2 で実装予定',
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+          const SizedBox(height: AppSizes.md),
+          RadioListTile<String>(
+            title: const Text(
+              'マニュアル（多角形・フリーハンド）',
+              style: TextStyle(color: Colors.white),
+            ),
+            subtitle: const Text(
+              '好きなようにを描いて背景削除',
+              style: TextStyle(color: Colors.grey),
+            ),
+            value: 'manual',
+            groupValue: _selectedMethod,
+            onChanged: (val) => setState(() => _selectedMethod = val ?? 'white'),
+            activeColor: AppColors.accent,
           ),
         ],
       ),
