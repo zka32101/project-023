@@ -67,7 +67,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 100,
                 height: 100,
                 decoration: BoxDecoration(
-                  color: AppColors.white.withValues(alpha: 0.2),
+                  color: AppColors.white.withOpacity(0.2),
                   borderRadius:
                       BorderRadius.circular(AppSizes.radiusXl),
                 ),
@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Text(
                 '親子で作るAR動画クリエーター',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppColors.white.withValues(alpha: 0.8),
+                      color: AppColors.white.withOpacity(0.8),
                     ),
               ),
               const SizedBox(height: 48),
@@ -104,7 +104,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 height: 40,
                 child: CircularProgressIndicator(
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.white.withValues(alpha: 0.8),
+                    AppColors.white.withOpacity(0.8),
                   ),
                   strokeWidth: 3,
                 ),
@@ -115,7 +115,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Text(
                 'AR初期化中...',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.white.withValues(alpha: 0.8),
+                      color: AppColors.white.withOpacity(0.8),
                     ),
               ),
             ],

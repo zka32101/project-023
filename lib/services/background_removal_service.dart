@@ -29,14 +29,15 @@ class BackgroundRemovalService {
       // ピクセルごとに処理
       for (int y = 0; y < image.height; y++) {
         for (int x = 0; x < image.width; x++) {
-          final pixel = image.getPixelRgba(x, y);
-          final r = pixel.r.toInt();
-          final g = pixel.g.toInt();
-          final b = pixel.b.toInt();
+          final pixel = image.getPixel(x, y);
+          final r = pixel.r as int;
+          final g = pixel.g as int;
+          final b = pixel.b as int;
 
           // 白判定：R, G, B が全て threshold 以上かつ色差が tolerance 以内
-          final max = [r, g, b].reduce((a, b) => a > b ? a : b);
-          final min = [r, g, b].reduce((a, b) => a < b ? a : b);
+          final colors = [r, g, b];
+          final max = colors.reduce((a, b) => a > b ? a : b);
+          final min = colors.reduce((a, b) => a < b ? a : b);
           final isWhite = max >= threshold && (max - min) <= tolerance;
 
           if (isWhite) {
@@ -89,10 +90,10 @@ class BackgroundRemovalService {
       // マスク適用
       for (int y = 0; y < sourceImage.height; y++) {
         for (int x = 0; x < sourceImage.width; x++) {
-          final pixel = sourceImage.getPixelRgba(x, y);
-          final r = pixel.r.toInt();
-          final g = pixel.g.toInt();
-          final b = pixel.b.toInt();
+          final pixel = sourceImage.getPixel(x, y);
+          final r = pixel.r as int;
+          final g = pixel.g as int;
+          final b = pixel.b as int;
 
           // マスクのアルファ値を使用
           final maskIndex = (y * maskImage.width + x) * 4 + 3;
