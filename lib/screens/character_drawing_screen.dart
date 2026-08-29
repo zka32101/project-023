@@ -101,7 +101,14 @@ class _CharacterDrawingScreenState
       final path = '${customDir.path}/character_$id.png';
       await File(path).writeAsBytes(bytes);
 
-      final character = CustomCharacter(id: id, name: 'マイキャラ', imagePath: path);
+      final character = CustomCharacter(
+        id: id,
+        name: 'マイキャラ',
+        imagePath: path,
+        sourceType: 'drawn',
+        removalMethod: 'none',
+        hasTransparency: false,
+      );
       await ref.read(customCharacterProvider.notifier).addCharacter(character);
 
       if (mounted) {
