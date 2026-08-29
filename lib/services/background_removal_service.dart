@@ -1,17 +1,8 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
-import 'package:logger/logger.dart';
-
-enum BackgroundRemovalMethod {
-  white,  // 白系背景自動削除
-  manual, // マニュアル切り抜き
-}
 
 class BackgroundRemovalService {
-  static final Logger _logger = Logger();
-
   /// L1: 白背景を自動削除して透明PNG を返す
   /// [imageBytes] - 入力画像バイト
   /// [threshold] - 白と判定する色差の閾値（0-255）
@@ -24,7 +15,7 @@ class BackgroundRemovalService {
     try {
       final image = img.decodeImage(imageBytes);
       if (image == null) {
-        _logger.e('Failed to decode image');
+        // Failed to decode image
         return null;
       }
 
@@ -61,7 +52,7 @@ class BackgroundRemovalService {
       final pngBytes = img.encodePng(resultImage);
       return pngBytes;
     } catch (e) {
-      _logger.e('Background removal error: $e');
+      // Background removal error
       return null;
     }
   }
@@ -76,7 +67,7 @@ class BackgroundRemovalService {
     try {
       final sourceImage = img.decodeImage(imageBytes);
       if (sourceImage == null) {
-        _logger.e('Failed to decode source image');
+        // Failed to decode source image
         return null;
       }
 
@@ -84,7 +75,7 @@ class BackgroundRemovalService {
       final maskByteData =
           await maskImage.toByteData(format: ui.ImageByteFormat.rawRgba);
       if (maskByteData == null) {
-        _logger.e('Failed to get mask byte data');
+        // Failed to get mask byte data
         return null;
       }
 
@@ -114,7 +105,7 @@ class BackgroundRemovalService {
       final pngBytes = img.encodePng(resultImage);
       return pngBytes;
     } catch (e) {
-      _logger.e('Manual mask application error: $e');
+      // Manual mask application error
       return null;
     }
   }
