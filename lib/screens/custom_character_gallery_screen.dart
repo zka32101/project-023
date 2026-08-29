@@ -323,12 +323,12 @@ class CustomCharacterGalleryScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _renameCharacter(
+  void _renameCharacter(
     BuildContext context,
     WidgetRef ref,
     CustomCharacter character,
     String newName,
-  ) async {
+  ) {
     try {
       final updated = character.copyWith(name: newName);
       final characters = ref.read(customCharacterProvider);
@@ -338,14 +338,25 @@ class CustomCharacterGalleryScreen extends ConsumerWidget {
         final newList = List<CustomCharacter>.from(characters);
         newList[index] = updated;
         ref.read(customCharacterProvider.notifier).state = newList;
-        await ref.read(customCharacterProvider.notifier).persistState();
+
+        // Persist in background
+        ref.read(customCharacterProvider.notifier).persistState().then((_) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('キャラクター名を変更しました')),
+            );
+          }
+        }).catchError((e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('保存エラー: $e')),
+            );
+          }
+        });
       }
 
       if (context.mounted) {
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('キャラクター名を変更しました')),
-        );
       }
     } catch (e) {
       AppLogger.error('Rename character', e);
