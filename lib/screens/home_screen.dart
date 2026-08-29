@@ -135,9 +135,10 @@ class HomeScreen extends ConsumerWidget {
 
               // Main Content
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                     // Mascot character (placeholder)
                     Container(
                       width: 120,
@@ -200,6 +201,7 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
+                  ),
                 ),
               ),
 
