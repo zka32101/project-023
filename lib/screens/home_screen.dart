@@ -8,6 +8,7 @@ import '../services/firebase_service.dart';
 import 'camera_screen.dart';
 import 'collection_screen.dart';
 import 'settings_screen.dart';
+import 'custom_character_gallery_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -134,9 +135,10 @@ class HomeScreen extends ConsumerWidget {
 
               // Main Content
               Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                     // Mascot character (placeholder)
                     Container(
                       width: 120,
@@ -199,6 +201,7 @@ class HomeScreen extends ConsumerWidget {
                       ),
                     ),
                   ],
+                  ),
                 ),
               ),
 
@@ -207,6 +210,29 @@ class HomeScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSizes.lg),
                 child: Column(
                   children: [
+                    // Custom Characters Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.white,
+                          side: const BorderSide(color: AppColors.white),
+                          padding: const EdgeInsets.symmetric(vertical: AppSizes.md),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                          ),
+                        ),
+                        onPressed: () => _goToCustomCharacters(context),
+                        icon: const Icon(Icons.pets_outlined),
+                        label: Text(
+                          'マイキャラクター',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: AppColors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.sm),
                     // Collection/Works Button
                     SizedBox(
                       width: double.infinity,
@@ -275,6 +301,13 @@ class HomeScreen extends ConsumerWidget {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const CollectionScreen()),
+    );
+  }
+
+  void _goToCustomCharacters(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const CustomCharacterGalleryScreen()),
     );
   }
 

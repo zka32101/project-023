@@ -48,4 +48,7 @@ class CustomCharacterNotifier extends StateNotifier<List<CustomCharacter>> {
       state.map((c) => jsonEncode(c.toJson())).toList(),
     );
   }
+
+  // 外部から呼び出し可能にする
+  Future<void> persistState() => _persist();
 }
