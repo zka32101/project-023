@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,10 +36,11 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
   late DrawingMode currentMode;
   late DrawingHistory history;
   late CanvasController canvasController;
-  Image? backgroundImage;
 
+  // Image ウィジェットは build 時に動的に生成
   List<Offset> polygonVertices = [];
   bool isProcessing = false;
+  bool _imageLoaded = true; // デコード完了フラグ
 
   @override
   void initState() {
@@ -48,41 +48,6 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
     currentMode = DrawingMode.polygon;
     history = DrawingHistory();
     canvasController = CanvasController();
-
-    // 画像をデコード
-    _initializeImage();
-  }
-
-  void _initializeImage() {
-    _decodeImage(widget.imageBytes).then((image) {
-      if (mounted) {
-        setState(() {
-          backgroundImage = image;
-        });
-      }
-    });
-  }
-
-  Future<Image> _decodeImage(Uint8List bytes) async {
-    final completer = Completer<Image>();
-    final image = Image.memory(
-      bytes,
-      fit: BoxFit.contain,
-    );
-
-    // Image ウィジェットのイメージストリームリスナーを設定
-    image.image!.addListener(
-      ImageStreamListener(
-        (image, synchronousCall) {
-          completer.complete(image.image);
-        },
-        onError: (error, stackTrace) {
-          completer.completeError(error, stackTrace);
-        },
-      ),
-    );
-
-    return completer.future;
   }
 
   void _onModeChanged(DrawingMode mode) {
@@ -233,10 +198,6 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
   }
 
   Widget _buildCanvas() {
-    if (backgroundImage == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
     return GestureDetector(
       onScaleUpdate: (details) {
         if (details.scale != 1.0) {
@@ -265,10 +226,17 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
   }
 
   Widget _buildDrawingMode() {
+    final backgroundImageWidget = _imageLoaded
+        ? Image.memory(
+            widget.imageBytes,
+            fit: BoxFit.contain,
+          )
+        : const SizedBox();
+
     switch (currentMode) {
       case DrawingMode.polygon:
         return PolygonDrawingMode(
-          backgroundImage: backgroundImage,
+          backgroundImage: _imageLoaded ? backgroundImageWidget : null,
           savedVertices: polygonVertices,
           onVerticesChanged: _onPolygonVerticesChanged,
           onPolygonComplete: _onPolygonComplete,
@@ -276,7 +244,7 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
 
       case DrawingMode.freehand:
         return FreehandDrawingMode(
-          backgroundImage: backgroundImage,
+          backgroundImage: _imageLoaded ? backgroundImageWidget : null,
           strokes: history.strokes,
           onStrokeAdded: _onStrokeAdded,
           onStrokeRemoved: _onStrokeRemoved,

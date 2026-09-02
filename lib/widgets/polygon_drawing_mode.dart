@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../config/constants.dart';
-import '../models/drawing_stroke.dart';
 
 /// 多角形選択モード
 class PolygonDrawingMode extends StatefulWidget {
