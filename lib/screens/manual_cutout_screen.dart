@@ -1,9 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../config/constants.dart';
 import '../models/drawing_stroke.dart';
-import '../services/background_removal_service.dart';
 import '../widgets/canvas_controls.dart';
 import '../widgets/drawing_toolbar.dart';
 import '../widgets/polygon_drawing_mode.dart';
@@ -84,9 +82,7 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
                 }
               },
               onPanUpdate: (details) {
-                if (details.pointerCount == 1) {
-                  canvasController.pan(details.delta);
-                }
+                canvasController.pan(details.delta);
               },
               child: Container(
                 color: Colors.grey[300],
