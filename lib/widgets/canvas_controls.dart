@@ -109,7 +109,7 @@ class CanvasBackgroundPainter extends CustomPainter {
   }
 
   void _drawGrid(Canvas canvas, Size size) {
-    final gridSize = 20.0;
+    const gridSize = 20.0;
     final paint = Paint()
       ..color = Colors.grey[300]!
       ..strokeWidth = 0.5;
