@@ -1,516 +1,290 @@
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 import '../config/constants.dart';
-import '../models/custom_character.dart';
 import '../models/drawing_stroke.dart';
 import '../services/background_removal_service.dart';
-import '../providers/custom_character_provider.dart';
-import '../utils/logger.dart';
+import '../widgets/canvas_controls.dart';
+import '../widgets/drawing_toolbar.dart';
+import '../widgets/polygon_drawing_mode.dart';
+import '../widgets/freehand_drawing_mode.dart';
 
+/// マニュアル切り抜きスクリーン
 class ManualCutoutScreen extends ConsumerStatefulWidget {
+  /// 処理する画像
   final Uint8List imageBytes;
 
-  const ManualCutoutScreen({Key? key, required this.imageBytes})
-      : super(key: key);
+  /// スクリーンタイトル
+  final String title;
+
+  /// 完了時のコールバック（透明PNG）
+  final ValueChanged<Uint8List>? onComplete;
+
+  const ManualCutoutScreen({
+    Key? key,
+    required this.imageBytes,
+    this.title = 'マニュアル切り抜き',
+    this.onComplete,
+  }) : super(key: key);
 
   @override
-  ConsumerState<ManualCutoutScreen> createState() => _ManualCutoutScreenState();
+  ConsumerState<ManualCutoutScreen> createState() =>
+      _ManualCutoutScreenState();
 }
 
 class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
-  late DrawingHistory _history;
-  String _mode = 'polygon'; // 'polygon' or 'freehand'
-  ui.Image? _image;
-  bool _isProcessing = false;
-  double _zoomLevel = 1.0;
-  Offset _panOffset = Offset.zero;
+  late DrawingMode currentMode;
+  late DrawingHistory history;
+  late CanvasController canvasController;
+  late Image backgroundImage;
+
+  List<Offset> polygonVertices = [];
+  bool isProcessing = false;
 
   @override
   void initState() {
     super.initState();
-    _history = DrawingHistory();
-    _loadImage();
+    currentMode = DrawingMode.polygon;
+    history = DrawingHistory();
+    canvasController = CanvasController();
+
+    // 画像をデコード
+    _initializeImage();
   }
 
-  Future<void> _loadImage() async {
-    try {
-      final image = await _decodeImage(widget.imageBytes);
-      setState(() => _image = image);
-    } catch (e) {
-      AppLogger.error('Load image in manual cutout', e);
+  void _initializeImage() {
+    _decodeImage(widget.imageBytes).then((image) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('画像読み込みエラー: $e')),
-        );
+        setState(() {
+          backgroundImage = image;
+        });
       }
-    }
-  }
-
-  Future<ui.Image> _decodeImage(Uint8List bytes) async {
-    final codec = await ui.instantiateImageCodec(bytes);
-    final frame = await codec.getNextFrame();
-    return frame.image;
-  }
-
-  void _addStroke(List<Offset> points, StrokeType type) {
-    setState(() {
-      _history.addStroke(DrawingStroke(
-        points: points,
-        type: type,
-      ));
     });
   }
 
-  void _undo() {
-    if (_history.undo()) {
-      setState(() {});
-    }
-  }
-
-  void _redo() {
-    if (_history.redo()) {
-      setState(() {});
-    }
-  }
-
-  void _clear() {
-    setState(() => _history.clear());
-  }
-
-  Future<void> _removeBackground() async {
-    if (_history.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('何か描いてから実行してください')),
-      );
-      return;
-    }
-
-    setState(() => _isProcessing = true);
-    try {
-      // マスク画像生成
-      final maskImage = await _generateMask();
-      if (maskImage == null) throw Exception('Failed to generate mask');
-
-      // 透明化処理
-      final resultBytes = await BackgroundRemovalService.applyManualMask(
-        widget.imageBytes,
-        maskImage,
-      );
-
-      if (resultBytes == null) throw Exception('Failed to apply mask');
-
-      // 保存＆キャラクター登録
-      final docsDir = await getApplicationDocumentsDirectory();
-      final customDir = Directory('${docsDir.path}/custom_characters');
-      if (!customDir.existsSync()) {
-        customDir.createSync(recursive: true);
-      }
-
-      final id = DateTime.now().millisecondsSinceEpoch.toString();
-      final path = '${customDir.path}/character_$id.png';
-      await File(path).writeAsBytes(resultBytes);
-
-      final character = CustomCharacter(
-        id: id,
-        name: 'カットアウトキャラ',
-        imagePath: path,
-        sourceType: 'photo',
-        removalMethod: 'manual',
-        hasTransparency: true,
-        originalFileSize: widget.imageBytes.length,
-      );
-
-      await ref.read(customCharacterProvider.notifier).addCharacter(character);
-
-      if (mounted) {
-        Navigator.pop(context, character);
-      }
-    } catch (e) {
-      AppLogger.error('Remove background in manual cutout', e);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('処理エラー: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } finally {
-      setState(() => _isProcessing = false);
-    }
-  }
-
-  List<Offset> _currentPolygon = [];
-  List<Offset> _currentFreehand = [];
-
-  void _onCanvasTap(TapDownDetails details) {
-    if (_mode != 'polygon') return;
-
-    final point = details.localPosition;
-
-    // 最後の点に近ければ完了
-    if (_currentPolygon.isNotEmpty &&
-        (_currentPolygon.last - point).distance < 20) {
-      if (_currentPolygon.length >= 3) {
-        _addStroke(_currentPolygon, StrokeType.polygon);
-        setState(() => _currentPolygon = []);
-      }
-      return;
-    }
-
-    setState(() => _currentPolygon.add(point));
-  }
-
-  void _onDrawStart(DragStartDetails details) {
-    if (_mode != 'freehand') return;
-    setState(() => _currentFreehand = [details.localPosition]);
-  }
-
-  void _onDrawUpdate(DragUpdateDetails details) {
-    if (_mode != 'freehand') return;
-    setState(() => _currentFreehand.add(details.localPosition));
-  }
-
-  void _onDrawEnd(DragEndDetails details) {
-    if (_mode != 'freehand' || _currentFreehand.isEmpty) return;
-    _addStroke(_currentFreehand, StrokeType.freehand);
-    setState(() => _currentFreehand = []);
-  }
-
-  Future<ui.Image?> _generateMask() async {
-    if (_image == null) return null;
-
-    // キャンバスサイズ
-    final recorder = ui.PictureRecorder();
-    final canvas = Canvas(recorder);
-    final size = Size(_image!.width.toDouble(), _image!.height.toDouble());
-
-    // 背景を黒で塗る（マスク初期値）
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = Colors.black,
+  Future<Image> _decodeImage(Uint8List bytes) async {
+    final completer = Completer<Image>();
+    final image = Image.memory(bytes);
+    image.image!.addListener(
+      ImageStreamListener((image, synchronousCall) {
+        completer.complete(image.image);
+      }),
     );
-
-    // ストロークを白で描画（保持領域）
-    final paint = Paint()..color = Colors.white;
-    for (final stroke in _history.currentStrokes) {
-      if (stroke.points.isEmpty) continue;
-
-      if (stroke.type == StrokeType.polygon) {
-        // 多角形を描画
-        canvas.drawPath(
-          _createPath(stroke.points, close: true),
-          paint,
-        );
-      } else if (stroke.type == StrokeType.freehand) {
-        // フリーハンドを描画
-        canvas.drawPath(
-          _createPath(stroke.points),
-          paint..strokeWidth = stroke.width,
-        );
-      }
-    }
-
-    final picture = recorder.endRecording();
-    return picture.toImage(_image!.width, _image!.height);
+    return completer.future;
   }
 
-  Path _createPath(List<Offset> points, {bool close = false}) {
-    if (points.isEmpty) return Path();
-
-    final path = Path();
-    path.moveTo(points[0].dx, points[0].dy);
-
-    for (int i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
-    }
-
-    if (close && points.length > 2) {
-      path.close();
-    }
-
-    return path;
+  void _onModeChanged(DrawingMode mode) {
+    setState(() {
+      currentMode = mode;
+      // モード変更時に履歴をクリア
+      history.clear();
+      polygonVertices.clear();
+    });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.darkBg,
-      appBar: AppBar(
-        title: const Text('マニュアルで背景を削除'),
-        backgroundColor: AppColors.darkBg,
-        foregroundColor: Colors.white,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          // キャンバス
-          Expanded(
-            child: _image == null
-                ? const Center(child: CircularProgressIndicator())
-                : MouseRegion(
-                    cursor: _mode == 'polygon'
-                        ? SystemMouseCursors.click
-                        : SystemMouseCursors.basic,
-                    child: GestureDetector(
-                      onTapDown: _mode == 'polygon' ? _onCanvasTap : null,
-                      onPanStart: _mode == 'freehand' ? _onDrawStart : null,
-                      onPanUpdate: (details) {
-                        if (_mode == 'freehand') {
-                          _onDrawUpdate(details);
-                        } else {
-                          setState(() => _panOffset += details.delta);
-                        }
-                      },
-                      onPanEnd: _mode == 'freehand' ? _onDrawEnd : null,
-                      child: CustomPaint(
-                        painter: _ManualCutoutPainter(
-                          image: _image!,
-                          history: _history,
-                          mode: _mode,
-                          zoomLevel: _zoomLevel,
-                          panOffset: _panOffset,
-                          currentPolygon: _currentPolygon,
-                          currentFreehand: _currentFreehand,
-                        ),
-                        size: Size.infinite,
-                      ),
-                    ),
-                  ),
+  void _onToolbarAction(String action) {
+    switch (action) {
+      case 'undo':
+        setState(() => history.undo());
+        break;
+      case 'redo':
+        setState(() => history.redo());
+        break;
+      case 'clear':
+        _showClearConfirmation();
+        break;
+      case 'reset_canvas':
+        canvasController.reset();
+        break;
+    }
+  }
+
+  void _showClearConfirmation() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('描画をクリアしますか？'),
+        content: const Text('この操作は取り消せません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('キャンセル'),
           ),
-
-          // ツールバー
-          Container(
-            color: Colors.grey.shade900,
-            padding: const EdgeInsets.all(AppSizes.md),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // モード選択
-                Row(
-                  children: [
-                    Expanded(
-                      child: SegmentedButton<String>(
-                        segments: const [
-                          ButtonSegment(
-                            value: 'polygon',
-                            label: Text('多角形'),
-                            icon: Icon(Icons.edit),
-                          ),
-                          ButtonSegment(
-                            value: 'freehand',
-                            label: Text('フリーハンド'),
-                            icon: Icon(Icons.brush),
-                          ),
-                        ],
-                        selected: {_mode},
-                        onSelectionChanged: (value) {
-                          setState(() => _mode = value.first);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSizes.sm),
-
-                // アクションボタン
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _history.canUndo ? _undo : null,
-                        icon: const Icon(Icons.undo),
-                        label: const Text('アンドゥ'),
-                      ),
-                    ),
-                    const SizedBox(width: AppSizes.sm),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _history.canRedo ? _redo : null,
-                        icon: const Icon(Icons.redo),
-                        label: const Text('リドゥ'),
-                      ),
-                    ),
-                    const SizedBox(width: AppSizes.sm),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: _history.isEmpty ? null : _clear,
-                        icon: const Icon(Icons.delete),
-                        label: const Text('クリア'),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSizes.sm),
-
-                // 実行ボタン
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _isProcessing ? null : _removeBackground,
-                    icon: _isProcessing
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.check),
-                    label: Text(
-                      _isProcessing ? '処理中...' : 'キャラクターにする',
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.accent,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: AppSizes.md),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                history.clear();
+                polygonVertices.clear();
+              });
+              Navigator.pop(context);
+            },
+            child: const Text('クリア'),
           ),
         ],
       ),
     );
   }
-}
 
-class _ManualCutoutPainter extends CustomPainter {
-  final ui.Image image;
-  final DrawingHistory history;
-  final String mode;
-  final double zoomLevel;
-  final Offset panOffset;
-  final List<Offset> currentPolygon;
-  final List<Offset> currentFreehand;
+  void _onPolygonComplete(List<Offset> vertices) async {
+    setState(() => isProcessing = true);
 
-  _ManualCutoutPainter({
-    required this.image,
-    required this.history,
-    required this.mode,
-    required this.zoomLevel,
-    required this.panOffset,
-    required this.currentPolygon,
-    required this.currentFreehand,
-  });
+    try {
+      // マスク生成ロジック（Day 5で実装）
+      // 今は仮のアラートを表示
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('多角形完了: ${vertices.length}頂点'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('エラー: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      setState(() => isProcessing = false);
+    }
+  }
+
+  void _onStrokeAdded(DrawingStroke stroke) {
+    history.addStroke(stroke);
+    setState(() {});
+  }
+
+  void _onStrokeRemoved() {
+    history.removeLastStroke();
+    setState(() {});
+  }
+
+  void _onPolygonVerticesChanged(List<Offset> vertices) {
+    setState(() {
+      polygonVertices = vertices;
+    });
+  }
 
   @override
-  void paint(Canvas canvas, Size size) {
-    // 背景描画
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = Colors.grey.shade800,
-    );
-
-    // 画像描画（ズーム & パン適用）
-    canvas.save();
-    canvas.translate(panOffset.dx, panOffset.dy);
-    canvas.scale(zoomLevel);
-
-    canvas.drawImage(image, Offset.zero, Paint());
-
-    // 描画ストロークを重ねる
-    _drawStrokes(canvas);
-
-    // 進行中のストロークを描画
-    if (currentPolygon.isNotEmpty && mode == 'polygon') {
-      const pointRadius = 6.0;
-      const pointColor = Colors.cyan;
-      final paint = Paint()
-        ..color = Colors.blue
-        ..strokeWidth = 2
-        ..style = PaintingStyle.stroke;
-
-      for (int i = 0; i < currentPolygon.length - 1; i++) {
-        canvas.drawLine(currentPolygon[i], currentPolygon[i + 1], paint);
-      }
-
-      for (final point in currentPolygon) {
-        canvas.drawCircle(point, pointRadius, Paint()..color = pointColor);
-      }
-    } else if (currentFreehand.isNotEmpty && mode == 'freehand') {
-      final paint = Paint()
-        ..color = Colors.green
-        ..strokeWidth = 2.0
-        ..strokeCap = StrokeCap.round
-        ..style = PaintingStyle.stroke;
-
-      for (int i = 0; i < currentFreehand.length - 1; i++) {
-        canvas.drawLine(currentFreehand[i], currentFreehand[i + 1], paint);
-      }
-    }
-
-    canvas.restore();
-
-    // ズームレベル表示
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: 'Zoom: ${(zoomLevel * 100).toStringAsFixed(0)}%',
-        style: const TextStyle(color: Colors.white, fontSize: 12),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        elevation: 0,
+        actions: [
+          // 完了ボタン
+          Padding(
+            padding: const EdgeInsets.all(AppSizes.md),
+            child: Center(
+              child: ElevatedButton.icon(
+                onPressed: isProcessing ? null : _submitCutout,
+                icon: const Icon(Icons.check),
+                label: const Text('完了'),
+              ),
+            ),
+          ),
+        ],
       ),
-      textDirection: TextDirection.ltr,
+      body: Stack(
+        children: [
+          Column(
+            children: [
+              // キャンバス
+              Expanded(
+                child: _buildCanvas(),
+              ),
+
+              // ツールバー
+              DrawingToolbar(
+                currentMode: currentMode,
+                onModeChanged: _onModeChanged,
+                onAction: _onToolbarAction,
+                canUndo: history.canUndo,
+                canRedo: history.canRedo,
+              ),
+            ],
+          ),
+
+          // ローディング表示
+          if (isProcessing)
+            Container(
+              color: Colors.black.withAlpha(150),
+              child: const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
-    textPainter.layout();
-    textPainter.paint(canvas, Offset(10, 10));
   }
 
-  void _drawStrokes(Canvas canvas) {
-    const pointRadius = 6.0;
-    const pointColor = Colors.cyan;
+  Widget _buildCanvas() {
+    if (backgroundImage == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-    for (final stroke in history.currentStrokes) {
-      if (stroke.points.isEmpty) continue;
-
-      if (stroke.type == StrokeType.polygon) {
-        // 多角形の辺を描画
-        final paint = Paint()
-          ..color = Colors.blue
-          ..strokeWidth = 2
-          ..style = PaintingStyle.stroke;
-
-        if (stroke.points.length > 1) {
-          for (int i = 0; i < stroke.points.length - 1; i++) {
-            canvas.drawLine(stroke.points[i], stroke.points[i + 1], paint);
-          }
-          // 最後の点と最初の点を繋ぐ
-          if (stroke.points.length > 2) {
-            canvas.drawLine(
-              stroke.points.last,
-              stroke.points.first,
-              paint,
-            );
-          }
+    return GestureDetector(
+      onScaleUpdate: (details) {
+        if (details.scale != 1.0) {
+          // ピンチズーム
+          canvasController.zoom(details.scale, details.localFocalPoint);
         }
-
-        // 頂点を描画
-        for (final point in stroke.points) {
-          canvas.drawCircle(point, pointRadius, Paint()..color = pointColor);
+      },
+      onPanUpdate: (details) {
+        // パン操作（ピンチズーム中でない場合）
+        if (details.pointerCount == 1) {
+          canvasController.pan(details.delta);
         }
-      } else if (stroke.type == StrokeType.freehand) {
-        // フリーハンドを描画
-        final paint = Paint()
-          ..color = Colors.green
-          ..strokeWidth = stroke.width
-          ..strokeCap = StrokeCap.round
-          ..style = PaintingStyle.stroke;
+      },
+      child: Container(
+        color: Colors.grey[300],
+        child: Transform.translate(
+          offset: canvasController.transform.offset,
+          child: Transform.scale(
+            scale: canvasController.transform.scale,
+            alignment: Alignment.topLeft,
+            child: _buildDrawingMode(),
+          ),
+        ),
+      ),
+    );
+  }
 
-        for (int i = 0; i < stroke.points.length - 1; i++) {
-          canvas.drawLine(stroke.points[i], stroke.points[i + 1], paint);
-        }
-      }
+  Widget _buildDrawingMode() {
+    switch (currentMode) {
+      case DrawingMode.polygon:
+        return PolygonDrawingMode(
+          backgroundImage: backgroundImage,
+          savedVertices: polygonVertices,
+          onVerticesChanged: _onPolygonVerticesChanged,
+          onPolygonComplete: _onPolygonComplete,
+        );
+
+      case DrawingMode.freehand:
+        return FreehandDrawingMode(
+          backgroundImage: backgroundImage,
+          strokes: history.strokes,
+          onStrokeAdded: _onStrokeAdded,
+          onStrokeRemoved: _onStrokeRemoved,
+        );
     }
   }
 
+  void _submitCutout() async {
+    // Day 5でマスク生成と透明化を実装
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Day 5で実装予定: マスク生成と透明化'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
-  bool shouldRepaint(covariant _ManualCutoutPainter oldDelegate) {
-    return oldDelegate.image != image ||
-        oldDelegate.history != history ||
-        oldDelegate.zoomLevel != zoomLevel ||
-        oldDelegate.panOffset != panOffset ||
-        oldDelegate.currentPolygon != currentPolygon ||
-        oldDelegate.currentFreehand != currentFreehand;
+  void dispose() {
+    canvasController.dispose();
+    super.dispose();
   }
 }

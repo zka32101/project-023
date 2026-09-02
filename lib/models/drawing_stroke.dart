@@ -1,109 +1,108 @@
 import 'package:flutter/material.dart';
 
-/// 単一のストロークを表現
+/// 描画ストロークデータモデル
 class DrawingStroke {
+  /// ストロークを構成するポイントのリスト
   final List<Offset> points;
-  final StrokeType type;
-  final Color color;
+
+  /// ストローク幅（ピクセル）
   final double width;
+
+  /// ストロークの色
+  final Color color;
+
+  /// ストローク作成時刻
   final DateTime createdAt;
 
   DrawingStroke({
     required this.points,
-    required this.type,
-    this.color = Colors.black,
     this.width = 2.0,
+    this.color = Colors.black,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
-  /// ストロークをコピー
+  /// ストロークのコピー（フィールド上書き用）
   DrawingStroke copyWith({
     List<Offset>? points,
-    StrokeType? type,
-    Color? color,
     double? width,
+    Color? color,
     DateTime? createdAt,
   }) {
     return DrawingStroke(
       points: points ?? this.points,
-      type: type ?? this.type,
-      color: color ?? this.color,
       width: width ?? this.width,
+      color: color ?? this.color,
       createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  /// ストロークが有効かどうかを判定（ポイント数 >= 2）
+  bool get isValid => points.length >= 2;
 }
 
-/// ストロークのタイプ
-enum StrokeType {
-  polygon,      // 多角形選択
-  freehand,     // フリーハンド描画
-  mask,         // マスク（内部用）
-}
-
-/// 描画履歴を管理
+/// 描画操作の履歴管理
 class DrawingHistory {
-  final List<DrawingStroke> strokes;
+  /// ストロークのリスト
+  final List<DrawingStroke> _strokes = [];
+
+  /// 現在の履歴インデックス
   int _currentIndex = -1;
 
-  DrawingHistory() : strokes = [];
+  /// 現在のストローク一覧を取得
+  List<DrawingStroke> get strokes => _strokes.sublist(0, _currentIndex + 1);
 
-  /// 現在の状態までのストロークを取得
-  List<DrawingStroke> get currentStrokes {
-    if (_currentIndex < 0) return [];
-    return strokes.sublist(0, _currentIndex + 1);
-  }
+  /// 複数のストローク値を取得（フリーハンド用）
+  List<DrawingStroke> get allStrokes => List.unmodifiable(_strokes);
+
+  /// アンドゥできるかどうか
+  bool get canUndo => _currentIndex > -1;
+
+  /// リドゥできるかどうか
+  bool get canRedo => _currentIndex < _strokes.length - 1;
 
   /// ストロークを追加
   void addStroke(DrawingStroke stroke) {
-    // 現在のインデックス以降を削除（新規分岐の場合）
-    if (_currentIndex < strokes.length - 1) {
-      strokes.removeRange(_currentIndex + 1, strokes.length);
+    // 現在位置より後ろのストロークを削除（アンドゥ後に新規操作した場合）
+    if (_currentIndex < _strokes.length - 1) {
+      _strokes.removeRange(_currentIndex + 1, _strokes.length);
     }
-    strokes.add(stroke);
-    _currentIndex = strokes.length - 1;
-  }
 
-  /// アンドゥ
-  bool undo() {
-    if (_currentIndex > 0) {
-      _currentIndex--;
-      return true;
-    }
-    return false;
-  }
-
-  /// リドゥ
-  bool redo() {
-    if (_currentIndex < strokes.length - 1) {
-      _currentIndex++;
-      return true;
-    }
-    return false;
+    _strokes.add(stroke);
+    _currentIndex++;
   }
 
   /// 最後のストロークを削除
-  bool removeLast() {
-    if (strokes.isNotEmpty && _currentIndex >= 0) {
-      strokes.removeAt(_currentIndex);
+  void removeLastStroke() {
+    if (_strokes.isNotEmpty && _currentIndex >= 0) {
+      _strokes.removeAt(_currentIndex);
       _currentIndex--;
-      return true;
     }
-    return false;
   }
 
-  /// クリア
+  /// アンドゥ実行
+  void undo() {
+    if (canUndo) {
+      _currentIndex--;
+    }
+  }
+
+  /// リドゥ実行
+  void redo() {
+    if (canRedo) {
+      _currentIndex++;
+    }
+  }
+
+  /// すべてをクリア
   void clear() {
-    strokes.clear();
+    _strokes.clear();
     _currentIndex = -1;
   }
 
-  /// 何もない状態か
-  bool get isEmpty => strokes.isEmpty;
-
-  /// アンドゥ可能か
-  bool get canUndo => _currentIndex > 0;
-
-  /// リドゥ可能か
-  bool get canRedo => _currentIndex < strokes.length - 1;
+  /// 現在のストロークをリセット（アンドゥで隠れたストロークは保持）
+  void resetToCurrentIndex() {
+    if (_currentIndex < _strokes.length - 1) {
+      _strokes.removeRange(_currentIndex + 1, _strokes.length);
+    }
+  }
 }
