@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +37,7 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
   late DrawingMode currentMode;
   late DrawingHistory history;
   late CanvasController canvasController;
-  late Image backgroundImage;
+  Image? backgroundImage;
 
   List<Offset> polygonVertices = [];
   bool isProcessing = false;
@@ -64,12 +65,23 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
 
   Future<Image> _decodeImage(Uint8List bytes) async {
     final completer = Completer<Image>();
-    final image = Image.memory(bytes);
-    image.image!.addListener(
-      ImageStreamListener((image, synchronousCall) {
-        completer.complete(image.image);
-      }),
+    final image = Image.memory(
+      bytes,
+      fit: BoxFit.contain,
     );
+
+    // Image ウィジェットのイメージストリームリスナーを設定
+    image.image!.addListener(
+      ImageStreamListener(
+        (image, synchronousCall) {
+          completer.complete(image.image);
+        },
+        onError: (error, stackTrace) {
+          completer.completeError(error, stackTrace);
+        },
+      ),
+    );
+
     return completer.future;
   }
 
