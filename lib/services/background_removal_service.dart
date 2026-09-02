@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
 
 class BackgroundRemovalService {
@@ -107,6 +108,56 @@ class BackgroundRemovalService {
       return pngBytes;
     } catch (e) {
       // Manual mask application error
+      return null;
+    }
+  }
+
+  /// 多角形頂点からマスク画像を生成
+  /// [vertices] - 多角形の頂点リスト
+  /// [canvasSize] - キャンバスサイズ
+  static Future<ui.Image?> generateMaskFromPolygon(
+    List<Offset> vertices,
+    Size canvasSize,
+  ) async {
+    if (vertices.length < 3) {
+      return null;
+    }
+
+    try {
+      // マスク画像を作成（白背景）
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder, Rect.fromLTWH(
+        0,
+        0,
+        canvasSize.width,
+        canvasSize.height,
+      ));
+
+      // 背景を白で塗りつぶし
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, canvasSize.width, canvasSize.height),
+        Paint()..color = Colors.white,
+      );
+
+      // 多角形を黒で塗りつぶし
+      final path = Path();
+      path.moveTo(vertices[0].dx, vertices[0].dy);
+      for (int i = 1; i < vertices.length; i++) {
+        path.lineTo(vertices[i].dx, vertices[i].dy);
+      }
+      path.close();
+
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = Colors.black
+          ..style = PaintingStyle.fill,
+      );
+
+      final picture = recorder.endRecording();
+      return picture.toImage(canvasSize.width.toInt(), canvasSize.height.toInt());
+    } catch (e) {
+      // Polygon mask generation error
       return null;
     }
   }
