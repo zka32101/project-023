@@ -37,10 +37,8 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
   late DrawingHistory history;
   late CanvasController canvasController;
 
-  // Image ウィジェットは build 時に動的に生成
   List<Offset> polygonVertices = [];
   bool isProcessing = false;
-  bool _imageLoaded = true; // デコード完了フラグ
 
   @override
   void initState() {
@@ -226,17 +224,15 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
   }
 
   Widget _buildDrawingMode() {
-    final backgroundImageWidget = _imageLoaded
-        ? Image.memory(
-            widget.imageBytes,
-            fit: BoxFit.contain,
-          )
-        : const SizedBox();
+    final backgroundImage = Image.memory(
+      widget.imageBytes,
+      fit: BoxFit.contain,
+    );
 
     switch (currentMode) {
       case DrawingMode.polygon:
         return PolygonDrawingMode(
-          backgroundImage: _imageLoaded ? backgroundImageWidget : null,
+          backgroundImage: backgroundImage,
           savedVertices: polygonVertices,
           onVerticesChanged: _onPolygonVerticesChanged,
           onPolygonComplete: _onPolygonComplete,
@@ -244,7 +240,7 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
 
       case DrawingMode.freehand:
         return FreehandDrawingMode(
-          backgroundImage: _imageLoaded ? backgroundImageWidget : null,
+          backgroundImage: backgroundImage,
           strokes: history.strokes,
           onStrokeAdded: _onStrokeAdded,
           onStrokeRemoved: _onStrokeRemoved,
