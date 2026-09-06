@@ -19,6 +19,9 @@ class PolygonDrawingMode extends StatefulWidget {
   /// 完了時のコールバック
   final ValueChanged<List<Offset>>? onPolygonComplete;
 
+  /// マスク適用時のコールバック
+  final VoidCallback? onApplyMask;
+
   const PolygonDrawingMode({
     Key? key,
     this.backgroundImage,
@@ -27,6 +30,7 @@ class PolygonDrawingMode extends StatefulWidget {
     this.savedVertices = const [],
     this.onVerticesChanged,
     this.onPolygonComplete,
+    this.onApplyMask,
   }) : super(key: key);
 
   @override
@@ -76,6 +80,8 @@ class _PolygonDrawingModeState extends State<PolygonDrawingMode> {
   void _completePolygon() {
     if (vertices.length >= 3) {
       widget.onPolygonComplete?.call(vertices);
+      // マスク適用処理を実行
+      widget.onApplyMask?.call();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

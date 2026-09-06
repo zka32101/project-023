@@ -22,6 +22,9 @@ class FreehandDrawingMode extends StatefulWidget {
   /// ストローク色
   final Color strokeColor;
 
+  /// マスク適用時のコールバック
+  final VoidCallback? onApplyMask;
+
   const FreehandDrawingMode({
     Key? key,
     this.backgroundImage,
@@ -30,6 +33,7 @@ class FreehandDrawingMode extends StatefulWidget {
     this.onStrokeRemoved,
     this.strokeWidth = 2.0,
     this.strokeColor = Colors.black,
+    this.onApplyMask,
   }) : super(key: key);
 
   @override
@@ -142,7 +146,8 @@ class _FreehandDrawingModeState extends State<FreehandDrawingMode> {
                   const SizedBox(height: AppSizes.md),
                   FloatingActionButton(
                     onPressed: () {
-                      // 完了時のアクションはスクリーンで処理
+                      // マスク適用処理を実行
+                      widget.onApplyMask?.call();
                     },
                     backgroundColor: AppColors.primaryStart,
                     heroTag: 'complete',

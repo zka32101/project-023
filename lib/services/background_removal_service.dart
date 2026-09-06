@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
+import '../models/drawing_stroke.dart';
 
 class BackgroundRemovalService {
   /// L1: 白背景を自動削除して透明PNG を返す
@@ -158,6 +159,59 @@ class BackgroundRemovalService {
       return picture.toImage(canvasSize.width.toInt(), canvasSize.height.toInt());
     } catch (e) {
       // Polygon mask generation error
+      return null;
+    }
+  }
+
+  /// フリーハンド描画からマスク画像を生成
+  /// [strokes] - 描画ストロークリスト
+  /// [canvasSize] - キャンバスサイズ
+  static Future<ui.Image?> generateMaskFromFreehand(
+    List<DrawingStroke> strokes,
+    Size canvasSize,
+  ) async {
+    try {
+      // マスク画像を作成（白背景）
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder, Rect.fromLTWH(
+        0,
+        0,
+        canvasSize.width,
+        canvasSize.height,
+      ));
+
+      // 背景を白で塗りつぶし
+      canvas.drawRect(
+        Rect.fromLTWH(0, 0, canvasSize.width, canvasSize.height),
+        Paint()..color = Colors.white,
+      );
+
+      // フリーハンドストロークを黒で描画
+      for (final stroke in strokes) {
+        if (stroke.points.length >= 2) {
+          final path = Path();
+          path.moveTo(stroke.points[0].dx, stroke.points[0].dy);
+
+          for (int i = 1; i < stroke.points.length; i++) {
+            path.lineTo(stroke.points[i].dx, stroke.points[i].dy);
+          }
+
+          canvas.drawPath(
+            path,
+            Paint()
+              ..color = Colors.black
+              ..strokeWidth = stroke.width
+              ..style = PaintingStyle.stroke
+              ..strokeCap = StrokeCap.round
+              ..strokeJoin = StrokeJoin.round,
+          );
+        }
+      }
+
+      final picture = recorder.endRecording();
+      return picture.toImage(canvasSize.width.toInt(), canvasSize.height.toInt());
+    } catch (e) {
+      // Freehand mask generation error
       return null;
     }
   }
