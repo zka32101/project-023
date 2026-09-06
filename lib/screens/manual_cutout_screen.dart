@@ -114,12 +114,24 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
         return;
       }
 
+      // 透明PNG をファイルに保存
+      final imagePath =
+          await BackgroundRemovalService.saveTransparentPng(
+        processedImage,
+        'polygon_cutout',
+      );
+
+      if (imagePath == null) {
+        _showError('ファイル保存に失敗しました');
+        return;
+      }
+
       // CustomCharacterを作成して返す
       if (mounted) {
         final character = CustomCharacter(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           name: '手動切り抜きキャラ',
-          imagePath: '', // 後で保存時に設定
+          imagePath: imagePath,
           sourceType: 'manual_cutout',
           removalMethod: 'polygon',
           hasTransparency: true,
@@ -179,12 +191,24 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
         return;
       }
 
+      // 透明PNG をファイルに保存
+      final imagePath =
+          await BackgroundRemovalService.saveTransparentPng(
+        processedImage,
+        'freehand_cutout',
+      );
+
+      if (imagePath == null) {
+        _showError('ファイル保存に失敗しました');
+        return;
+      }
+
       // CustomCharacterを作成して返す
       if (mounted) {
         final character = CustomCharacter(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           name: '手動切り抜きキャラ',
-          imagePath: '',
+          imagePath: imagePath,
           sourceType: 'manual_cutout',
           removalMethod: 'freehand',
           hasTransparency: true,

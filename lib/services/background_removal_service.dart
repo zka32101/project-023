@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
 import '../models/drawing_stroke.dart';
 
 class BackgroundRemovalService {
@@ -212,6 +214,33 @@ class BackgroundRemovalService {
       return picture.toImage(canvasSize.width.toInt(), canvasSize.height.toInt());
     } catch (e) {
       // Freehand mask generation error
+      return null;
+    }
+  }
+
+  /// 透明PNGをファイルに保存
+  /// [pngBytes] - PNG画像バイト
+  /// [filename] - 保存ファイル名（拡張子なし）
+  static Future<String?> saveTransparentPng(
+    Uint8List pngBytes,
+    String filename,
+  ) async {
+    try {
+      final docsDir = await getApplicationDocumentsDirectory();
+      final customDir = Directory('${docsDir.path}/manual_cutout_characters');
+
+      // ディレクトリがなければ作成
+      if (!customDir.existsSync()) {
+        customDir.createSync(recursive: true);
+      }
+
+      final filepath = '${customDir.path}/${filename}_${DateTime.now().millisecondsSinceEpoch}.png';
+      final file = File(filepath);
+      await file.writeAsBytes(pngBytes);
+
+      return filepath;
+    } catch (e) {
+      // Save transparent PNG error
       return null;
     }
   }
