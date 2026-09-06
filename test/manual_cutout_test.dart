@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
-import 'package:path_provider/path_provider.dart';
 import 'package:tsukuani/models/drawing_stroke.dart';
 import 'package:tsukuani/services/background_removal_service.dart';
 
@@ -118,12 +118,12 @@ void main() {
       );
       
       expect(resultBytes, isNotNull);
-      
+
       // Verify PNG signature
-      expect(resultBytes![0], 137); // PNG signature first byte
-      expect(resultBytes![1], 80);  // P
-      expect(resultBytes![2], 78);  // N
-      expect(resultBytes![3], 71);  // G
+      expect(resultBytes[0], 137); // PNG signature first byte
+      expect(resultBytes[1], 80);  // P
+      expect(resultBytes[2], 78);  // N
+      expect(resultBytes[3], 71);  // G
     });
 
     test('Save transparent PNG creates file with correct path', () async {

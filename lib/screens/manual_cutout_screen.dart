@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/drawing_stroke.dart';
@@ -306,7 +305,7 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
               onApplyMask: _processPolygonAndReturn,
             ),
             if (_isProcessing)
-              Center(
+              const Center(
                 child: CircularProgressIndicator(),
               ),
           ],
@@ -329,7 +328,7 @@ class _ManualCutoutScreenState extends ConsumerState<ManualCutoutScreen> {
               onApplyMask: _processFreehandAndReturn,
             ),
             if (_isProcessing)
-              Center(
+              const Center(
                 child: CircularProgressIndicator(),
               ),
           ],
