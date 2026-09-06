@@ -120,10 +120,11 @@ void main() {
       expect(resultBytes, isNotNull);
 
       // Verify PNG signature
-      expect(resultBytes[0], 137); // PNG signature first byte
-      expect(resultBytes[1], 80);  // P
-      expect(resultBytes[2], 78);  // N
-      expect(resultBytes[3], 71);  // G
+      final pngBytes = resultBytes!;
+      expect(pngBytes[0], 137); // PNG signature first byte
+      expect(pngBytes[1], 80);  // P
+      expect(pngBytes[2], 78);  // N
+      expect(pngBytes[3], 71);  // G
     });
 
     test('Save transparent PNG creates file with correct path', () async {
