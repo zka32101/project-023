@@ -484,7 +484,7 @@ class CustomCharacterGalleryScreen extends ConsumerWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.brush, color: AppColors.accent),
+              leading: const Icon(Icons.brush, color: AppColors.accent),
               title: const Text(
                 '手書きで作成',
                 style: TextStyle(color: Colors.white),
@@ -509,7 +509,7 @@ class CustomCharacterGalleryScreen extends ConsumerWidget {
               },
             ),
             ListTile(
-              leading: Icon(Icons.image, color: AppColors.accent),
+              leading: const Icon(Icons.image, color: AppColors.accent),
               title: const Text(
                 '写真から背景を削除',
                 style: TextStyle(color: Colors.white),
