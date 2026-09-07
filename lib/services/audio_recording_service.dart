@@ -132,7 +132,7 @@ class AudioRecordingService {
     try {
       if (!_isRecording || _isPaused) return 0.0;
       final amplitude = await _recorder.getAmplitude();
-      return amplitude.current ?? 0.0;
+      return amplitude.current;
     } catch (e) {
       return 0.0;
     }
