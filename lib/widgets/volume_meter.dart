@@ -122,9 +122,9 @@ class VolumeMeter extends StatelessWidget {
 
         // スケール表示
         const SizedBox(height: 4),
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: const [
+          children: [
             Text('静か', style: TextStyle(color: Colors.grey, fontSize: 10)),
             Text('通常', style: TextStyle(color: Colors.grey, fontSize: 10)),
             Text('大きい', style: TextStyle(color: Colors.grey, fontSize: 10)),

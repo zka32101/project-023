@@ -34,7 +34,6 @@ class DubbingStudioScreen extends ConsumerStatefulWidget {
 
 class _DubbingStudioScreenState extends ConsumerState<DubbingStudioScreen> {
   late final AudioRecordingService _recordingService;
-  late final AudioPlaybackService _playbackService;
 
   bool _isRecording = false;
   bool _isPaused = false;
