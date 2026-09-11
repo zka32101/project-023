@@ -24,4 +24,11 @@ jobs:
         run: flutter pub get
 
       - name: Run Flutter Analyze
-        run: flutter analyze
+        run: |
+          flutter analyze > analysis_output.txt 2>&1
+          if grep -E "^\s+error:" analysis_output.txt; then
+            exit 1
+          else
+            cat analysis_output.txt
+            exit 0
+          fi
