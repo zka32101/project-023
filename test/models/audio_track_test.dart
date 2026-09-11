@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/models/audio_track.dart';
+import 'package:project_023/models/audio_track.dart';
 
 void main() {
   group('AudioTrack', () {

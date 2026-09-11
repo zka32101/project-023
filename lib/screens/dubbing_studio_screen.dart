@@ -7,7 +7,6 @@ import '../models/audio_track.dart';
 import '../models/dubbing_project.dart';
 import '../providers/dubbing_project_provider.dart';
 import '../services/audio_recording_service.dart';
-import '../services/audio_playback_service.dart';
 import '../utils/logger.dart';
 import '../widgets/waveform_painter.dart';
 import '../widgets/volume_meter.dart';

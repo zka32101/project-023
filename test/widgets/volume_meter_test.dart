@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/widgets/volume_meter.dart';
+import 'package:project_023/widgets/volume_meter.dart';
 
 void main() {
   group('VolumeMeter Widget', () {

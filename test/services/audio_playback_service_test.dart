@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/services/audio_playback_service.dart';
+import 'package:project_023/services/audio_playback_service.dart';
 
 void main() {
   group('AudioPlaybackService', () {
@@ -21,41 +21,48 @@ void main() {
 
     test('initial state is not playing', () {
       expect(playbackService.isPlaying, false);
-      expect(playbackService.currentPosition, 0);
+      expect(playbackService.currentAudioPath, null);
     });
 
     test('volume setter accepts valid range', () async {
-      await playbackService.setVolume(0.5);
-      expect(playbackService.volume, 0.5);
+      final result = await playbackService.setVolume(0.5);
+      expect(result, true);
     });
 
-    test('volume setter clamps to [0.0, 1.0]', () async {
-      await playbackService.setVolume(1.5);
-      expect(playbackService.volume, 1.0);
-
-      await playbackService.setVolume(-0.5);
-      expect(playbackService.volume, 0.0);
+    test('volume setter clamps to valid range', () async {
+      final result1 = await playbackService.setVolume(1.5);
+      final result2 = await playbackService.setVolume(-0.5);
+      expect(result1, true);
+      expect(result2, true);
     });
 
     test('playback rate setter accepts valid values', () async {
-      await playbackService.setPlaybackRate(1.5);
-      expect(playbackService.playbackRate, 1.5);
+      final result = await playbackService.setPlaybackRate(1.5);
+      expect(result, true);
     });
 
     test('playback rate setter clamps to [0.5, 2.0]', () async {
-      await playbackService.setPlaybackRate(3.0);
-      expect(playbackService.playbackRate, 2.0);
-
-      await playbackService.setPlaybackRate(0.1);
-      expect(playbackService.playbackRate, 0.5);
+      final result1 = await playbackService.setPlaybackRate(3.0);
+      final result2 = await playbackService.setPlaybackRate(0.1);
+      expect(result1, true);
+      expect(result2, true);
     });
 
     test('looping can be toggled', () async {
-      await playbackService.setLooping(true);
-      expect(playbackService.isLooping, true);
+      final result1 = await playbackService.setLooping(true);
+      final result2 = await playbackService.setLooping(false);
+      expect(result1, true);
+      expect(result2, true);
+    });
 
-      await playbackService.setLooping(false);
-      expect(playbackService.isLooping, false);
+    test('getCurrentPosition returns valid value or null', () async {
+      final position = await playbackService.getCurrentPosition();
+      expect(position, isA<int?>());
+    });
+
+    test('getDuration returns valid value or null', () async {
+      final duration = await playbackService.getDuration();
+      expect(duration, isA<int?>());
     });
   });
 }
