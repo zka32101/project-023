@@ -122,10 +122,10 @@ class AudioTrackList extends ConsumerWidget {
                 ],
               ),
             ),
-            PopupMenuItem<String>(
+            const PopupMenuItem<String>(
               value: 'delete',
               child: Row(
-                children: const [
+                children: [
                   Icon(Icons.delete, color: Colors.red, size: 18),
                   SizedBox(width: 8),
                   Text(

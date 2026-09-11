@@ -48,7 +48,6 @@ class _DubbingStudioScreenState extends ConsumerState<DubbingStudioScreen> {
   void initState() {
     super.initState();
     _recordingService = AudioRecordingService();
-    _playbackService = AudioPlaybackService();
     _startAmplitudeMonitoring();
   }
 

@@ -27,21 +27,6 @@ class TimingAdjustmentWidget extends ConsumerWidget {
     return '$minutes:$seconds';
   }
 
-  /// 時間文字列からフレーム数に変換
-  int _timeStringToFrames(String timeStr) {
-    try {
-      final parts = timeStr.split(':');
-      if (parts.length != 2) return track.startFrame;
-
-      final minutes = int.parse(parts[0]);
-      final seconds = double.parse(parts[1]);
-      final totalSeconds = minutes * 60 + seconds;
-      return (totalSeconds * project.fps).toInt();
-    } catch (e) {
-      return track.startFrame;
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
@@ -211,10 +196,10 @@ class TimingAdjustmentWidget extends ConsumerWidget {
   /// 再生情報表示
   Widget _buildPlaybackInfo() {
     final durationMs = track.duration;
-    final durationSeconds = (durationMs / 1000).toStringAsFixed(2);
+    final durationSeconds = (durationMs ~/ 1000).toStringAsFixed(2);
 
     // 開始フレームから終了フレームまでの時間を計算
-    final endFrame = track.startFrame + (track.duration * project.fps / 1000).toInt();
+    final endFrame = track.startFrame + ((track.duration * project.fps) ~/ 1000);
     final endFrameClamped = endFrame.clamp(0, project.totalFrames);
 
     return Container(
@@ -252,7 +237,7 @@ class TimingAdjustmentWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            '音声長: ${durationSeconds}秒',
+            '音声長: $durationSeconds秒',
             style: TextStyle(
               color: Colors.grey.shade300,
               fontSize: 11,
