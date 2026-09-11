@@ -7,7 +7,6 @@ import '../models/audio_track.dart';
 import '../models/dubbing_project.dart';
 import '../providers/dubbing_project_provider.dart';
 import '../services/audio_recording_service.dart';
-import '../services/audio_playback_service.dart';
 import '../utils/logger.dart';
 import '../widgets/waveform_painter.dart';
 import '../widgets/volume_meter.dart';
@@ -34,7 +33,6 @@ class DubbingStudioScreen extends ConsumerStatefulWidget {
 
 class _DubbingStudioScreenState extends ConsumerState<DubbingStudioScreen> {
   late final AudioRecordingService _recordingService;
-  late final AudioPlaybackService _playbackService;
 
   bool _isRecording = false;
   bool _isPaused = false;
@@ -49,7 +47,6 @@ class _DubbingStudioScreenState extends ConsumerState<DubbingStudioScreen> {
   void initState() {
     super.initState();
     _recordingService = AudioRecordingService();
-    _playbackService = AudioPlaybackService();
     _startAmplitudeMonitoring();
   }
 
