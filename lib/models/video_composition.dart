@@ -220,20 +220,18 @@ class VideoComposition {
   }
 
   @override
-  int get hashCode {
-    return hashValues(
-      id,
-      projectId,
-      outputPath,
-      format,
-      resolution,
-      fps,
-      fileSizeMB,
-      createdAt,
-      status,
-      errorMessage,
-    );
-  }
+  int get hashCode => Object.hash(
+        id,
+        projectId,
+        outputPath,
+        format,
+        resolution,
+        fps,
+        fileSizeMB,
+        createdAt,
+        status,
+        errorMessage,
+      );
 
   @override
   String toString() =>

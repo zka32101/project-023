@@ -225,7 +225,7 @@ void main() {
 
       final command = builder.build();
 
-      expect(command.length, greaterThan(0);
+      expect(command.length, greaterThan(0));
       expect(command.first, equals('ffmpeg'));
       expect(command, contains('-framerate'));
       expect(command, contains('-i'));

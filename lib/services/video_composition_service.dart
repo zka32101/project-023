@@ -1,7 +1,9 @@
 /// Video composition service for combining animation frames with audio
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import '../models/video_composition.dart';
 import '../utils/audio_mixing_utils.dart';
@@ -314,9 +316,10 @@ class VideoCompositionService {
       int startTime = DateTime.now().millisecondsSinceEpoch;
 
       // Read stdout
-      _currentProcess!.stdout.transform(
-        const _Utf8ToStringTransformer(),
-      ).listen((line) {
+      _currentProcess!.stdout
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .listen((line) {
         if (_isCancelled) return;
 
         // Parse frame number from FFmpeg output
@@ -380,7 +383,7 @@ class VideoCompositionService {
 
   /// Generate unique ID
   String _generateId() {
-    return 'comp_${DateTime.now().millisecondsSinceEpoch}_${(Math.random() * 10000).toInt()}';
+    return 'comp_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(10000)}';
   }
 
   /// Cleanup resources
@@ -391,15 +394,3 @@ class VideoCompositionService {
   }
 }
 
-/// UTF-8 to String transformer
-class _Utf8ToStringTransformer extends StreamTransformer<List<int>, String> {
-  const _Utf8ToStringTransformer();
-
-  @override
-  Stream<String> bind(Stream<List<int>> stream) {
-    return stream.map((bytes) => String.fromCharCodes(bytes));
-  }
-}
-
-// Import Math for random
-import 'dart:math' as Math;
