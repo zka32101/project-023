@@ -178,7 +178,7 @@ void main() {
   });
 
   group('FollowRelationship', () {
-    test('copyWith creates new instance with modified fields', () {
+    test('copyWith preserves relationship data', () {
       final now = DateTime.now();
       final original = FollowRelationship(
         followerId: 'user1',
@@ -186,12 +186,11 @@ void main() {
         followedAt: now,
       );
 
-      final modified = original.copyWith(
-        followerCount: 100,
-      );
+      final modified = original.copyWith();
 
       expect(modified.followerId, equals(original.followerId));
       expect(modified.followingId, equals(original.followingId));
+      expect(modified.followedAt, equals(original.followedAt));
     });
 
     test('toJson and fromJson work correctly', () {
