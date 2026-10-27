@@ -68,12 +68,11 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: EngagementMetrics(
-                views: 1000,
-                likes: 200,
-                shares: 50,
-                comments: 75,
-                engagementRate: 32.5,
-              ),
+              views: 1000,
+              likes: 200,
+              shares: 50,
+              comments: 75,
+              engagementRate: 32.5,
             ),
           ),
         );
@@ -89,12 +88,11 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: EngagementMetrics(
-                views: 100000,
-                likes: 5000,
-                shares: 500,
-                comments: 1000,
-                engagementRate: 10.0,
-              ),
+              views: 100000,
+              likes: 5000,
+              shares: 500,
+              comments: 1000,
+              engagementRate: 10.0,
             ),
           ),
         );
@@ -107,13 +105,12 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: EngagementMetrics(
-                views: 1000,
-                likes: 200,
-                shares: 50,
-                comments: 75,
-                engagementRate: 32.5,
-                trendUp: true,
-              ),
+              views: 1000,
+              likes: 200,
+              shares: 50,
+              comments: 75,
+              engagementRate: 32.5,
+              trendUp: true,
             ),
           ),
         );
@@ -125,12 +122,11 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: EngagementMetrics(
-                views: 1000,
-                likes: 200,
-                shares: 50,
-                comments: 75,
-                engagementRate: 32.5,
-              ),
+              views: 1000,
+              likes: 200,
+              shares: 50,
+              comments: 75,
+              engagementRate: 32.5,
             ),
           ),
         );
@@ -145,8 +141,8 @@ void main() {
       testWidgets('displays 5 stars rating', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-          home: RatingDisplay(rating: 5.0),
-        ),
+            home: RatingDisplay(rating: 5.0),
+          ),
         );
 
         expect(find.text('★★★★★'), findsOneWidget);
@@ -165,8 +161,8 @@ void main() {
       testWidgets('displays zero rating', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-          home: RatingDisplay(rating: 0.0),
-        ),
+            home: RatingDisplay(rating: 0.0),
+          ),
         );
 
         expect(find.text('☆☆☆☆☆'), findsOneWidget);
@@ -244,7 +240,6 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: CommentCard(comment: comment, onExpand: () {}),
-            ),
           ),
         );
 
@@ -267,9 +262,8 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: CommentCard(
-                comment: comment,
-                onLike: () {},
-              ),
+              comment: comment,
+              onLike: () {},
             ),
           ),
         );
@@ -295,8 +289,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-          home: CommentCard(comment: comment),
-        ),
+            home: CommentCard(comment: comment),
+          ),
         );
 
         expect(find.byIcon(Icons.push_pin), findsOneWidget);
@@ -322,8 +316,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-          home: UserCard(profile: profile),
-        ),
+            home: UserCard(profile: profile),
+          ),
         );
 
         expect(find.text('Creator'), findsOneWidget);
@@ -350,10 +344,9 @@ void main() {
         await tester.pumpWidget(
           MaterialApp(
             home: UserCard(
-                profile: profile,
-                onFollowPressed: () {},
-                isFollowing: false,
-              ),
+              profile: profile,
+              onFollowPressed: () {},
+              isFollowing: false,
             ),
           ),
         );
@@ -379,8 +372,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-          home: UserCard(profile: profile),
-        ),
+            home: UserCard(profile: profile),
+          ),
         );
 
         expect(find.text('25'), findsOneWidget);
@@ -409,8 +402,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-          home: UserCard(profile: profile),
-        ),
+            home: UserCard(profile: profile),
+          ),
         );
 
         await tester.pumpAndSettle();
