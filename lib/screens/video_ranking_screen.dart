@@ -142,27 +142,27 @@ class _VideoRankingScreenState extends State<VideoRankingScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            SizedBox(
+                            Container(
                               width: double.infinity,
                               height: 120,
-                              child: Container(
-                                color: Colors.grey[300],
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Image.network(
-                                      'https://images.unsplash.com/photo-1616530940355-af822a3a37c7?w=400',
-                                      width: double.infinity,
-                                      height: 120,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    Icon(
-                                      Icons.play_circle_outline,
-                                      size: 48,
-                                      color: Colors.white.withOpacity(0.7),
-                                    ),
-                                  ],
-                                ),
+                              color: Colors.grey[300],
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/placeholder_video.png',
+                                    width: double.infinity,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        const SizedBox.expand(),
+                                  ),
+                                  Icon(
+                                    Icons.play_circle_outline,
+                                    size: 48,
+                                    color: Colors.white.withOpacity(0.8),
+                                  ),
+                                ],
                               ),
                             ),
                             ListTile(
