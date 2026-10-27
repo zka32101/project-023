@@ -18,12 +18,14 @@ class VideoRankingScreen extends StatefulWidget {
 
 class _VideoRankingScreenState extends State<VideoRankingScreen> {
   late VideoRankingService rankingService;
+  late RankingPeriod _selectedPeriod;
   List<RankedVideo> rankedVideos = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _selectedPeriod = widget.period;
     rankingService = VideoRankingService.instance;
     loadRanking();
   }
@@ -31,7 +33,7 @@ class _VideoRankingScreenState extends State<VideoRankingScreen> {
   Future<void> loadRanking() async {
     setState(() => isLoading = true);
 
-    final videos = switch (widget.period) {
+    final videos = switch (_selectedPeriod) {
       RankingPeriod.daily => await rankingService.getDailyRanking(limit: widget.limit),
       RankingPeriod.weekly => await rankingService.getWeeklyRanking(limit: widget.limit),
       RankingPeriod.monthly => await rankingService.getMonthlyRanking(limit: widget.limit),
@@ -44,7 +46,7 @@ class _VideoRankingScreenState extends State<VideoRankingScreen> {
   }
 
   String getPeriodLabel() {
-    return switch (widget.period) {
+    return switch (_selectedPeriod) {
       RankingPeriod.daily => 'Daily Ranking',
       RankingPeriod.weekly => 'Weekly Ranking',
       RankingPeriod.monthly => 'Monthly Ranking',
@@ -71,12 +73,42 @@ class _VideoRankingScreenState extends State<VideoRankingScreen> {
     return stars;
   }
 
+  Widget _buildPeriodButton(String label, RankingPeriod period) {
+    final isSelected = _selectedPeriod == period;
+    return ElevatedButton(
+      onPressed: () {
+        setState(() => _selectedPeriod = period);
+        loadRanking();
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? Colors.blueAccent : Colors.grey[200],
+        foregroundColor: isSelected ? Colors.white : Colors.black,
+      ),
+      child: Text(label),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(getPeriodLabel()),
         elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(56),
+          child: Container(
+            color: Colors.grey[50],
+            padding: const EdgeInsets.all(8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildPeriodButton('Daily', RankingPeriod.daily),
+                _buildPeriodButton('Weekly', RankingPeriod.weekly),
+                _buildPeriodButton('Monthly', RankingPeriod.monthly),
+              ],
+            ),
+          ),
+        ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -104,50 +136,83 @@ class _VideoRankingScreenState extends State<VideoRankingScreen> {
                   itemCount: rankedVideos.length,
                   itemBuilder: (context, index) {
                     final video = rankedVideos[index];
-                    return ListTile(
-                      leading: Container(
-                        width: 56,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: Colors.blueAccent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Rank #${video.rank}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
+                    return Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Card(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(
+                              'assets/placeholder.png',
+                              width: double.infinity,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: double.infinity,
+                                  height: 120,
+                                  color: Colors.grey[300],
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.image_not_supported,
+                                      size: 48,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
-                          ),
+                            ListTile(
+                              leading: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.blueAccent,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    '#${video.rank}',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              title: Text(video.title),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const SizedBox(height: 4),
+                                  Wrap(
+                                    spacing: 16,
+                                    children: [
+                                      Text('Views: ${formatNumber(video.viewCount)}'),
+                                      Text('Likes: ${formatNumber(video.likeCount)}'),
+                                      Text('Shares: ${formatNumber(video.shareCount)}'),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text('Score: ${video.engagementScore.toStringAsFixed(2)}'),
+                                  Text(
+                                    getStarRating(video.averageRating),
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              trailing: Icon(
+                                Icons.trending_up,
+                                color: Colors.green[600],
+                              ),
+                              onTap: () {
+                                // Navigate to video details
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      title: Text(video.title),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 4),
-                          Text(
-                            'Views: ${formatNumber(video.viewCount)} | Likes: ${formatNumber(video.likeCount)}',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          Text(
-                            'Shares: ${formatNumber(video.shareCount)} | Score: ${video.engagementScore.toStringAsFixed(2)}',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          Text(
-                            getStarRating(video.averageRating),
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                      trailing: Icon(
-                        Icons.trending_up,
-                        color: Colors.green[600],
-                      ),
-                      onTap: () {
-                        // Navigate to video details
-                      },
                     );
                   },
                 ),
