@@ -28,6 +28,7 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
   bool isLoading = true;
   double averageRating = 0.0;
   Set<String> likedComments = {};
+  Set<String> expandedComments = {};
 
   @override
   void initState() {
@@ -200,7 +201,27 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                                               const SizedBox(width: 4),
                                               Text('Likes: ${comment.likeCount}'),
                                               const SizedBox(width: 16),
-                                              Text('Replies: ${comment.replyCount}'),
+                                              if (comment.replyCount > 0)
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if (expandedComments.contains(comment.id)) {
+                                                        expandedComments.remove(comment.id);
+                                                      } else {
+                                                        expandedComments.add(comment.id);
+                                                      }
+                                                    });
+                                                  },
+                                                  child: Text(
+                                                    'Replies: ${comment.replyCount}',
+                                                    style: const TextStyle(
+                                                      color: Colors.blue,
+                                                      decoration: TextDecoration.underline,
+                                                    ),
+                                                  ),
+                                                )
+                                              else
+                                                Text('Replies: ${comment.replyCount}'),
                                             ],
                                           ),
                                         ],
