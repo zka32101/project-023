@@ -27,6 +27,7 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
   TextEditingController commentController = TextEditingController();
   bool isLoading = true;
   double averageRating = 0.0;
+  Set<String> likedComments = {};
 
   @override
   void initState() {
@@ -69,6 +70,17 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
     );
 
     commentController.clear();
+    await loadData();
+  }
+
+  Future<void> toggleLike(VideoComment comment) async {
+    if (likedComments.contains(comment.id)) {
+      await commentsService.unlikeComment(widget.videoId, comment.id, 'current_user_id');
+      setState(() => likedComments.remove(comment.id));
+    } else {
+      await commentsService.likeComment(widget.videoId, comment.id, 'current_user_id');
+      setState(() => likedComments.add(comment.id));
+    }
     await loadData();
   }
 
@@ -167,7 +179,18 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                                           const SizedBox(height: 8),
                                           Row(
                                             children: [
-                                              Icon(Icons.favorite_border, size: 16),
+                                              GestureDetector(
+                                                onTap: () => toggleLike(comment),
+                                                child: Icon(
+                                                  likedComments.contains(comment.id)
+                                                      ? Icons.favorite
+                                                      : Icons.favorite_border,
+                                                  size: 16,
+                                                  color: likedComments.contains(comment.id)
+                                                      ? Colors.red
+                                                      : null,
+                                                ),
+                                              ),
                                               const SizedBox(width: 4),
                                               Text('Likes: ${comment.likeCount}'),
                                               const SizedBox(width: 16),
