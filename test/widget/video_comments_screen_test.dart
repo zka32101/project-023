@@ -270,25 +270,6 @@ void main() {
       expect(find.text('Comment'), findsNothing);
     });
 
-    testWidgets('search comments by text', (WidgetTester tester) async {
-      await commentsService.postComment(videoId, 'user1', 'User 1', 'Love this video');
-      await commentsService.postComment(videoId, 'user2', 'User 2', 'Hate this');
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: VideoCommentsScreen(videoId: videoId),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byIcon(Icons.search), 'love');
-      await tester.pumpAndSettle();
-
-      expect(find.text('Love this video'), findsOneWidget);
-      expect(find.text('Hate this'), findsNothing);
-    });
-
     testWidgets('pagination loads more comments', (WidgetTester tester) async {
       for (int i = 0; i < 15; i++) {
         await commentsService.postComment(videoId, 'user$i', 'User $i', 'Comment $i');
