@@ -21,6 +21,8 @@ void main() {
         ),
       );
 
+      await tester.pumpAndSettle();
+
       expect(find.text('No comments yet. Be the first!'), findsOneWidget);
     });
 
