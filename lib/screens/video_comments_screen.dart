@@ -154,6 +154,9 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
       replyText,
       parentCommentId: parentCommentId,
     );
+    setState(() {
+      expandedComments.add(parentCommentId);
+    });
     await loadData();
   }
 
