@@ -64,11 +64,9 @@ class _VideoRankingScreenState extends State<VideoRankingScreen> {
 
   String getStarRating(double rating) {
     int fullStars = rating.toInt();
-    bool hasHalf = (rating - fullStars) >= 0.5;
-    int emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
+    int emptyStars = 5 - fullStars;
 
     String stars = '★' * fullStars;
-    if (hasHalf) stars += '✩';
     stars += '☆' * emptyStars;
     return stars;
   }
