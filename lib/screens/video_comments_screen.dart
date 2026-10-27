@@ -25,12 +25,10 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
   List<VideoComment> comments = [];
   List<VideoReview> reviews = [];
   TextEditingController commentController = TextEditingController();
-  TextEditingController searchController = TextEditingController();
   bool isLoading = true;
   double averageRating = 0.0;
   Set<String> likedComments = {};
   Set<String> expandedComments = {};
-  String searchQuery = '';
 
   @override
   void initState() {
@@ -44,7 +42,6 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
   void dispose() {
     tabController.dispose();
     commentController.dispose();
-    searchController.dispose();
     super.dispose();
   }
 
@@ -90,16 +87,13 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
 
   List<VideoComment> getDisplayComments() {
     final displayList = <VideoComment>[];
-    final query = searchQuery.toLowerCase();
 
     for (final comment in comments) {
       if (comment.parentCommentId == null) {
-        if (query.isEmpty || comment.text.toLowerCase().contains(query)) {
-          displayList.add(comment);
-          if (expandedComments.contains(comment.id)) {
-            final replies = comments.where((c) => c.parentCommentId == comment.id).toList();
-            displayList.addAll(replies);
-          }
+        displayList.add(comment);
+        if (expandedComments.contains(comment.id)) {
+          final replies = comments.where((c) => c.parentCommentId == comment.id).toList();
+          displayList.addAll(replies);
         }
       }
     }
@@ -214,34 +208,8 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                       // Comments Tab
                       Column(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: TextField(
-                              controller: searchController,
-                              onChanged: (value) {
-                                setState(() => searchQuery = value);
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Search comments...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              ),
-                            ),
-                          ),
                           Expanded(
-                            child: getDisplayComments().isEmpty && comments.isNotEmpty
-                                ? Center(
-                                    child: Text(
-                                      'No comments match your search',
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                            color: Colors.grey[600],
-                                          ),
-                                    ),
-                                  )
-                                : comments.isEmpty
+                            child: comments.isEmpty
                                     ? Center(
                                         child: Column(
                                           mainAxisAlignment: MainAxisAlignment.center,
