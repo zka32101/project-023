@@ -167,8 +167,14 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(comment.userDisplayName),
-                                          if (comment.isPinned)
-                                            const Icon(Icons.push_pin, size: 16),
+                                          Row(
+                                            children: [
+                                              if (comment.isFlagged)
+                                                const Icon(Icons.flag, size: 16, color: Colors.red),
+                                              if (comment.isPinned)
+                                                const Icon(Icons.push_pin, size: 16),
+                                            ],
+                                          ),
                                         ],
                                       ),
                                       subtitle: Column(
