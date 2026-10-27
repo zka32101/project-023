@@ -178,16 +178,26 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                   Container(
                     padding: const EdgeInsets.all(16),
                     color: Colors.grey[100],
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          getStarRating(averageRating.toInt()),
-                          style: const TextStyle(fontSize: 20),
+                        Row(
+                          children: [
+                            Text(
+                              getStarRating(averageRating.toInt()),
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                            const SizedBox(width: 16),
+                            Text(
+                              'Average: ${averageRating.toStringAsFixed(1)}',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 16),
-                        Text(
-                          'Average: ${averageRating.toStringAsFixed(1)}',
-                          style: Theme.of(context).textTheme.titleMedium,
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          height: 100,
+                          child: _RatingDistributionChart(reviews: reviews),
                         ),
                       ],
                     ),
@@ -442,5 +452,85 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
         ),
       ),
     );
+  }
+}
+
+class _RatingDistributionChart extends StatelessWidget {
+  final List<VideoReview> reviews;
+
+  const _RatingDistributionChart({required this.reviews});
+
+  @override
+  Widget build(BuildContext context) {
+    final ratingCounts = <int, int>{1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+
+    for (final review in reviews) {
+      ratingCounts[review.rating] = (ratingCounts[review.rating] ?? 0) + 1;
+    }
+
+    final maxCount = ratingCounts.values.isEmpty ? 1 : ratingCounts.values.reduce((a, b) => a > b ? a : b);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        for (int rating = 5; rating >= 1; rating--)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: CustomPaint(
+                      painter: _BarChartPainter(
+                        height: ratingCounts[rating]?.toDouble() ?? 0,
+                        maxHeight: maxCount.toDouble(),
+                      ),
+                      size: Size.infinite,
+                    ),
+                  ),
+                  Text(
+                    '$rating★',
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _BarChartPainter extends CustomPainter {
+  final double height;
+  final double maxHeight;
+
+  _BarChartPainter({required this.height, required this.maxHeight});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (maxHeight == 0) return;
+
+    final paint = Paint()
+      ..color = Colors.blue
+      ..style = PaintingStyle.fill;
+
+    final barHeight = (height / maxHeight) * size.height;
+
+    canvas.drawRect(
+      Rect.fromLTWH(
+        0,
+        size.height - barHeight,
+        size.width,
+        barHeight,
+      ),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_BarChartPainter oldDelegate) {
+    return oldDelegate.height != height || oldDelegate.maxHeight != maxHeight;
   }
 }
