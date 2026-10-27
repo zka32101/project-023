@@ -132,14 +132,14 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          IconButton(
+            icon: const Icon(Icons.send),
             onPressed: () {
               if (replyController.text.isNotEmpty) {
                 _postReply(parentComment.id, replyController.text);
                 Navigator.of(context).pop();
               }
             },
-            child: const Text('Reply'),
           ),
         ],
       ),
