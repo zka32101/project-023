@@ -85,6 +85,20 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
     await loadData();
   }
 
+  List<VideoComment> getDisplayComments() {
+    final displayList = <VideoComment>[];
+    for (final comment in comments) {
+      if (comment.parentCommentId == null) {
+        displayList.add(comment);
+        if (expandedComments.contains(comment.id)) {
+          final replies = comments.where((c) => c.parentCommentId == comment.id).toList();
+          displayList.addAll(replies);
+        }
+      }
+    }
+    return displayList;
+  }
+
   String getStarRating(int rating) {
     String stars = '★' * rating;
     stars += '☆' * (5 - rating);
@@ -152,9 +166,10 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                               ),
                             )
                           : ListView.builder(
-                              itemCount: comments.length,
+                              itemCount: getDisplayComments().length,
                               itemBuilder: (context, index) {
-                                final comment = comments[index];
+                                final displayComments = getDisplayComments();
+                                final comment = displayComments[index];
                                 return Padding(
                                   padding: const EdgeInsets.all(8),
                                   child: Card(
