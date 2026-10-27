@@ -14,10 +14,8 @@ void main() {
       testWidgets('displays single badge correctly', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: BadgeDisplay(badges: [UserBadge.verified]),
-            ),
-          ),
+          home: BadgeDisplay(badges: [UserBadge.verified]),
+        ),
         );
 
         expect(find.byIcon(Icons.verified), findsOneWidget);
@@ -48,10 +46,8 @@ void main() {
       testWidgets('handles empty badge list', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: BadgeDisplay(badges: []),
-            ),
-          ),
+          home: BadgeDisplay(badges: []),
+        ),
         );
 
         expect(find.byType(Chip), findsNothing);
@@ -60,10 +56,8 @@ void main() {
       testWidgets('badge tooltips show on hover', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: BadgeDisplay(badges: [UserBadge.milestone100k]),
-            ),
-          ),
+          home: BadgeDisplay(badges: [UserBadge.milestone100k]),
+        ),
         );
 
         await tester.pumpAndSettle();
@@ -157,10 +151,8 @@ void main() {
       testWidgets('displays 5 stars rating', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: RatingDisplay(rating: 5.0),
-            ),
-          ),
+          home: RatingDisplay(rating: 5.0),
+        ),
         );
 
         expect(find.text('★★★★★'), findsOneWidget);
@@ -181,10 +173,8 @@ void main() {
       testWidgets('displays zero rating', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: RatingDisplay(rating: 0.0),
-            ),
-          ),
+          home: RatingDisplay(rating: 0.0),
+        ),
         );
 
         expect(find.text('☆☆☆☆☆'), findsOneWidget);
@@ -242,10 +232,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: CommentCard(comment: comment),
-            ),
-          ),
+          home: CommentCard(comment: comment),
+        ),
         );
 
         expect(find.text('User'), findsOneWidget);
@@ -321,10 +309,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: CommentCard(comment: comment),
-            ),
-          ),
+          home: CommentCard(comment: comment),
+        ),
         );
 
         expect(find.byIcon(Icons.push_pin), findsOneWidget);
@@ -350,10 +336,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: UserCard(profile: profile),
-            ),
-          ),
+          home: UserCard(profile: profile),
+        ),
         );
 
         expect(find.text('Creator'), findsOneWidget);
@@ -410,10 +394,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: UserCard(profile: profile),
-            ),
-          ),
+          home: UserCard(profile: profile),
+        ),
         );
 
         expect(find.text('25'), findsOneWidget);
@@ -442,10 +424,8 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: UserCard(profile: profile),
-            ),
-          ),
+          home: UserCard(profile: profile),
+        ),
         );
 
         await tester.pumpAndSettle();

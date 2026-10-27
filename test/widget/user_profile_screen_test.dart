@@ -23,9 +23,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -44,9 +42,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -66,9 +62,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -89,9 +83,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -112,9 +104,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -132,9 +122,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -153,9 +141,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -219,9 +205,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -241,9 +225,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -261,9 +243,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -281,9 +261,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -327,9 +305,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -379,9 +355,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 
@@ -395,9 +369,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId),
-          ),
+          home: UserProfileScreen(userId: userId),
         ),
       );
 

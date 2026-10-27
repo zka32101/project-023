@@ -17,9 +17,7 @@ void main() {
     testWidgets('displays empty state when no comments', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -33,9 +31,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -50,9 +46,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -69,9 +63,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -85,9 +77,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -111,9 +101,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -141,9 +129,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -164,9 +150,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -186,9 +170,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -200,9 +182,7 @@ void main() {
     testWidgets('comment text field allows posting new comment', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -220,9 +200,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -279,9 +257,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 
@@ -300,9 +276,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoCommentsScreen(videoId: videoId),
-          ),
+          home: VideoCommentsScreen(videoId: videoId),
         ),
       );
 

@@ -16,9 +16,7 @@ void main() {
     testWidgets('displays empty state when no videos', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
@@ -34,9 +32,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
@@ -53,9 +49,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
@@ -71,9 +65,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.weekly),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.weekly),
         ),
       );
 
@@ -87,9 +79,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
@@ -107,9 +97,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily, limit: 10),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily, limit: 10),
         ),
       );
 
@@ -130,9 +118,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
@@ -147,9 +133,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
@@ -169,9 +153,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
@@ -185,9 +167,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
@@ -207,9 +187,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: VideoRankingScreen(period: RankingPeriod.daily),
-          ),
+          home: VideoRankingScreen(period: RankingPeriod.daily),
         ),
       );
 
