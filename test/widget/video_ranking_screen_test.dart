@@ -20,6 +20,8 @@ void main() {
         ),
       );
 
+      await tester.pumpAndSettle();
+
       expect(find.text('No videos to rank yet'), findsOneWidget);
     });
 
