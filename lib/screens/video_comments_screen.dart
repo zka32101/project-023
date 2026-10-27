@@ -144,6 +144,8 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
         ],
       ),
     );
+
+    replyController.dispose();
   }
 
   Future<void> _postReply(String parentCommentId, String replyText) async {
