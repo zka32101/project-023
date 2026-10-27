@@ -67,7 +67,7 @@ void main() {
         );
 
         await tester.pumpAndSettle();
-        expect(find.text('1M Milestone'), findsOneWidget);
+        expect(find.text('100K Milestone'), findsOneWidget);
       });
     });
 
@@ -87,14 +87,14 @@ void main() {
           ),
         );
 
-        expect(find.text('1000'), findsOneWidget);
+        expect(find.text('1.0K'), findsOneWidget);
         expect(find.text('200'), findsOneWidget);
         expect(find.text('50'), findsOneWidget);
         expect(find.text('75'), findsOneWidget);
         expect(find.text('32.5%'), findsOneWidget);
       });
 
-      testWidgets('formats large numbers with commas', (WidgetTester tester) async {
+      testWidgets('formats large numbers with K/M suffixes', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
             home: Scaffold(
@@ -109,8 +109,8 @@ void main() {
           ),
         );
 
-        expect(find.text('100,000'), findsOneWidget);
-        expect(find.text('5,000'), findsOneWidget);
+        expect(find.text('100.0K'), findsOneWidget);
+        expect(find.text('5.0K'), findsOneWidget);
       });
 
       testWidgets('shows engagement trend arrows', (WidgetTester tester) async {
@@ -274,7 +274,7 @@ void main() {
         );
 
         expect(find.text('Replies: 3'), findsOneWidget);
-        expect(find.byIcon(Icons.expand_more), findsOneWidget);
+        expect(find.byIcon(Icons.comment), findsOneWidget);
       });
 
       testWidgets('displays like button', (WidgetTester tester) async {
@@ -417,7 +417,7 @@ void main() {
         );
 
         expect(find.text('25'), findsOneWidget);
-        expect(find.text('50000'), findsOneWidget);
+        expect(find.text('50K'), findsOneWidget);
       });
 
       testWidgets('responsive layout', (WidgetTester tester) async {

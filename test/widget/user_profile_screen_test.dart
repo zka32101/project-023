@@ -97,9 +97,11 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.text('Videos: 10'), findsOneWidget);
-      expect(find.text('Views: 5000'), findsOneWidget);
-      expect(find.text('Likes: 500'), findsOneWidget);
+      expect(find.text('10'), findsOneWidget);
+      expect(find.text('Views'), findsOneWidget);
+      expect(find.text('5.0K'), findsOneWidget);
+      expect(find.text('Likes'), findsOneWidget);
+      expect(find.text('0.5K'), findsOneWidget);
     });
 
     testWidgets('displays average rating', (WidgetTester tester) async {
