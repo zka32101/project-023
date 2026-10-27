@@ -25,10 +25,12 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
   List<VideoComment> comments = [];
   List<VideoReview> reviews = [];
   TextEditingController commentController = TextEditingController();
+  TextEditingController searchController = TextEditingController();
   bool isLoading = true;
   double averageRating = 0.0;
   Set<String> likedComments = {};
   Set<String> expandedComments = {};
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -42,6 +44,7 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
   void dispose() {
     tabController.dispose();
     commentController.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
@@ -87,12 +90,16 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
 
   List<VideoComment> getDisplayComments() {
     final displayList = <VideoComment>[];
+    final query = searchQuery.toLowerCase();
+
     for (final comment in comments) {
       if (comment.parentCommentId == null) {
-        displayList.add(comment);
-        if (expandedComments.contains(comment.id)) {
-          final replies = comments.where((c) => c.parentCommentId == comment.id).toList();
-          displayList.addAll(replies);
+        if (query.isEmpty || comment.text.toLowerCase().contains(query)) {
+          displayList.add(comment);
+          if (expandedComments.contains(comment.id)) {
+            final replies = comments.where((c) => c.parentCommentId == comment.id).toList();
+            displayList.addAll(replies);
+          }
         }
       }
     }
@@ -103,6 +110,51 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
     String stars = '★' * rating;
     stars += '☆' * (5 - rating);
     return stars;
+  }
+
+  Future<void> _showReplyDialog(BuildContext context, VideoComment parentComment) async {
+    final replyController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reply to Comment'),
+        content: TextField(
+          controller: replyController,
+          decoration: const InputDecoration(
+            hintText: 'Write your reply...',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (replyController.text.isNotEmpty) {
+                _postReply(parentComment.id, replyController.text);
+                Navigator.of(context).pop();
+              }
+            },
+            child: const Text('Reply'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _postReply(String parentCommentId, String replyText) async {
+    await commentsService.postComment(
+      widget.videoId,
+      'current_user_id',
+      'Current User',
+      replyText,
+      parentCommentId: parentCommentId,
+    );
+    await loadData();
   }
 
   @override
@@ -145,27 +197,56 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                     controller: tabController,
                     children: [
                       // Comments Tab
-                      comments.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.comment_outlined,
-                                    size: 64,
-                                    color: Colors.grey[400],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'No comments yet. Be the first!',
-                                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                          color: Colors.grey[600],
-                                        ),
-                                  ),
-                                ],
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: TextField(
+                              controller: searchController,
+                              onChanged: (value) {
+                                setState(() => searchQuery = value);
+                              },
+                              decoration: InputDecoration(
+                                hintText: 'Search comments...',
+                                prefixIcon: const Icon(Icons.search),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               ),
-                            )
-                          : ListView.builder(
+                            ),
+                          ),
+                          Expanded(
+                            child: getDisplayComments().isEmpty && comments.isNotEmpty
+                                ? Center(
+                                    child: Text(
+                                      'No comments match your search',
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                            color: Colors.grey[600],
+                                          ),
+                                    ),
+                                  )
+                                : comments.isEmpty
+                                    ? Center(
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.comment_outlined,
+                                              size: 64,
+                                              color: Colors.grey[400],
+                                            ),
+                                            const SizedBox(height: 16),
+                                            Text(
+                                              'No comments yet. Be the first!',
+                                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                                    color: Colors.grey[600],
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    : ListView.builder(
                               itemCount: getDisplayComments().length,
                               itemBuilder: (context, index) {
                                 final displayComments = getDisplayComments();
@@ -237,6 +318,19 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                                                 )
                                               else
                                                 Text('Replies: ${comment.replyCount}'),
+                                              const SizedBox(width: 16),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  _showReplyDialog(context, comment);
+                                                },
+                                                child: const Text(
+                                                  'Reply',
+                                                  style: TextStyle(
+                                                    color: Colors.blue,
+                                                    decoration: TextDecoration.underline,
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ],
@@ -251,6 +345,9 @@ class _VideoCommentsScreenState extends State<VideoCommentsScreen> with SingleTi
                                 );
                               },
                             ),
+                          ),
+                        ],
+                      ),
                       // Reviews Tab
                       reviews.isEmpty
                           ? Center(
