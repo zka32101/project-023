@@ -128,12 +128,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
                                       children: [
                                         CircleAvatar(
                                           radius: 40,
-                                          backgroundImage: profile!.profileImageUrl != null
-                                              ? NetworkImage(profile!.profileImageUrl!)
-                                              : null,
-                                          child: profile!.profileImageUrl == null
-                                              ? Text(profile!.displayName[0].toUpperCase())
-                                              : null,
+                                          backgroundColor: Colors.grey[300],
+                                          child: profile!.profileImageUrl != null
+                                              ? ClipOval(
+                                                  child: Image.network(
+                                                    profile!.profileImageUrl!,
+                                                    fit: BoxFit.cover,
+                                                    width: 80,
+                                                    height: 80,
+                                                    errorBuilder: (context, error, stackTrace) =>
+                                                        Text(profile!.displayName[0].toUpperCase()),
+                                                  ),
+                                                )
+                                              : Text(profile!.displayName[0].toUpperCase()),
                                         ),
                                         const SizedBox(width: 16),
                                         Expanded(
