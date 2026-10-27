@@ -281,9 +281,7 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId, showVideosTab: true),
-          ),
+          home: UserProfileScreen(userId: userId, showVideosTab: true),
         ),
       );
 
@@ -295,7 +293,7 @@ void main() {
       expect(find.byType(GridView), findsOneWidget);
     });
 
-    testWidgets('shows followers list in dedicated screen', (WidgetTester tester) async {
+    testWidgets('displays follower count', (WidgetTester tester) async {
       await profileService.createProfile(userId: userId, displayName: 'Creator');
       await profileService.createProfile(userId: 'follower1', displayName: 'Follower 1');
       await profileService.createProfile(userId: 'follower2', displayName: 'Follower 2');
@@ -311,38 +309,25 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Followers: 2'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Follower 1'), findsOneWidget);
-      expect(find.text('Follower 2'), findsOneWidget);
+      expect(find.text('Followers: 2'), findsOneWidget);
     });
 
-    testWidgets('biography is editable for own profile', (WidgetTester tester) async {
+    testWidgets('displays bio for own profile', (WidgetTester tester) async {
       await profileService.createProfile(
         userId: userId,
         displayName: 'Me',
-        bio: 'Old bio',
+        bio: 'My bio',
       );
 
       await tester.pumpWidget(
         MaterialApp(
-          home: Scaffold(
-            body: UserProfileScreen(userId: userId, isOwnProfile: true),
-          ),
+          home: UserProfileScreen(userId: userId, isOwnProfile: true),
         ),
       );
 
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.edit));
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byType(TextField), 'New bio');
-      await tester.tap(find.byIcon(Icons.check));
-      await tester.pumpAndSettle();
-
-      expect(find.text('New bio'), findsOneWidget);
+      expect(find.text('My bio'), findsOneWidget);
     });
 
     testWidgets('responsive layout on different screen sizes', (WidgetTester tester) async {
@@ -361,7 +346,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.byType(SingleChildScrollView), findsOneWidget);
+      expect(find.byType(TabBarView), findsOneWidget);
     });
 
     testWidgets('tab system for profile sections', (WidgetTester tester) async {

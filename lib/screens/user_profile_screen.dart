@@ -91,6 +91,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
       appBar: AppBar(
         title: const Text('Profile'),
         elevation: 0,
+        bottom: widget.showVideosTab
+            ? TabBar(
+                controller: tabController,
+                tabs: const [
+                  Tab(text: 'Info'),
+                  Tab(text: 'Videos'),
+                ],
+              )
+            : null,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -101,205 +110,411 @@ class _UserProfileScreenState extends State<UserProfileScreen> with SingleTicker
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 )
-              : SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Profile Header
-                      Container(
-                        color: Colors.grey[100],
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: profile!.profileImageUrl != null
-                                      ? NetworkImage(profile!.profileImageUrl!)
-                                      : null,
-                                  child: profile!.profileImageUrl == null
-                                      ? Text(profile!.displayName[0].toUpperCase())
-                                      : null,
+              : widget.showVideosTab
+                  ? TabBarView(
+                      controller: tabController,
+                      children: [
+                        // Info Tab
+                        SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              // Profile Header
+                              Container(
+                                color: Colors.grey[100],
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 40,
+                                          backgroundImage: profile!.profileImageUrl != null
+                                              ? NetworkImage(profile!.profileImageUrl!)
+                                              : null,
+                                          child: profile!.profileImageUrl == null
+                                              ? Text(profile!.displayName[0].toUpperCase())
+                                              : null,
+                                        ),
+                                        const SizedBox(width: 16),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      profile!.displayName,
+                                                      style: Theme.of(context).textTheme.titleLarge,
+                                                    ),
+                                                  ),
+                                                  if (profile!.isVerified)
+                                                    const Icon(
+                                                      Icons.verified,
+                                                      color: Colors.blue,
+                                                      size: 20,
+                                                    ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  Text('Followers: ${profile!.followerCount}'),
+                                                  const SizedBox(width: 16),
+                                                  Text('Following: ${profile!.followingCount}'),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    if (profile!.bio != null && profile!.bio!.isNotEmpty)
+                                      Text(profile!.bio!),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        if (!widget.isOwnProfile && widget.currentUserId != null)
+                                          ElevatedButton.icon(
+                                            onPressed: toggleFollow,
+                                            icon: Icon(
+                                              isFollowing ? Icons.person_remove : Icons.person_add,
+                                            ),
+                                            label: Text(isFollowing ? 'Unfollow' : 'Follow'),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(width: 16),
-                                Expanded(
+                              ),
+                              // Statistics
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Statistics',
+                                      style: Theme.of(context).textTheme.titleMedium,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    GridView.count(
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 12,
+                                      crossAxisSpacing: 12,
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      children: [
+                                        _StatCard(
+                                          label: 'Videos',
+                                          value: profile!.totalVideos.toString(),
+                                        ),
+                                        _StatCard(
+                                          label: 'Views',
+                                          value: '${(profile!.totalViews / 1000).toStringAsFixed(1)}K',
+                                        ),
+                                        _StatCard(
+                                          label: 'Likes',
+                                          value: '${(profile!.totalLikes / 1000).toStringAsFixed(1)}K',
+                                        ),
+                                        _StatCard(
+                                          label: 'Rating',
+                                          value: profile!.averageRating.toStringAsFixed(1),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Engagement Info
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Engagement',
+                                      style: Theme.of(context).textTheme.titleMedium,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        Text('Rate: ${profile!.getEngagementRate().toStringAsFixed(1)}%'),
+                                        const SizedBox(width: 24),
+                                        Text(
+                                          'Avg Views/Video: ${profile!.getAverageViewsPerVideo().toStringAsFixed(1)}',
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // Badges
+                              if (profile!.badges.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              profile!.displayName,
-                                              style: Theme.of(context).textTheme.titleLarge,
-                                            ),
-                                          ),
-                                          if (profile!.isVerified)
-                                            const Icon(
-                                              Icons.verified,
-                                              color: Colors.blue,
-                                              size: 20,
-                                            ),
-                                        ],
+                                      Text(
+                                        'Badges',
+                                        style: Theme.of(context).textTheme.titleMedium,
                                       ),
-                                      const SizedBox(height: 8),
-                                      Row(
-                                        children: [
-                                          Text('Followers: ${profile!.followerCount}'),
-                                          const SizedBox(width: 16),
-                                          Text('Following: ${profile!.followingCount}'),
-                                        ],
+                                      const SizedBox(height: 12),
+                                      Wrap(
+                                        spacing: 8,
+                                        children: profile!.badges.map((badge) {
+                                          return Chip(
+                                            avatar: const Icon(Icons.star),
+                                            label: Text(badge.name),
+                                          );
+                                        }).toList(),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            if (profile!.bio != null && profile!.bio!.isNotEmpty)
-                              Text(profile!.bio!),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                if (!widget.isOwnProfile && widget.currentUserId != null)
-                                  ElevatedButton.icon(
-                                    onPressed: toggleFollow,
-                                    icon: Icon(
-                                      isFollowing ? Icons.person_remove : Icons.person_add,
-                                    ),
-                                    label: Text(isFollowing ? 'Unfollow' : 'Follow'),
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Statistics
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Statistics',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 12),
-                            GridView.count(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 12,
-                              crossAxisSpacing: 12,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              children: [
-                                _StatCard(
-                                  label: 'Videos',
-                                  value: profile!.totalVideos.toString(),
-                                ),
-                                _StatCard(
-                                  label: 'Views',
-                                  value: '${(profile!.totalViews / 1000).toStringAsFixed(1)}K',
-                                ),
-                                _StatCard(
-                                  label: 'Likes',
-                                  value: '${(profile!.totalLikes / 1000).toStringAsFixed(1)}K',
-                                ),
-                                _StatCard(
-                                  label: 'Rating',
-                                  value: profile!.averageRating.toStringAsFixed(1),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Engagement Info
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Engagement',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Text('Rate: ${profile!.getEngagementRate().toStringAsFixed(1)}%'),
-                                const SizedBox(width: 24),
-                                Text(
-                                  'Avg Views/Video: ${profile!.getAverageViewsPerVideo().toStringAsFixed(1)}',
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      // Badges
-                      if (profile!.badges.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Badges',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              Wrap(
-                                spacing: 8,
-                                children: profile!.badges.map((badge) {
-                                  return Chip(
-                                    avatar: const Icon(Icons.star),
-                                    label: Text(badge.name),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
-                          ),
-                        ),
-                      // Social Links
-                      if (profile!.socialLinks.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Social Links',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 12),
-                              ...profile!.socialLinks.entries.map((entry) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
-                                  child: Row(
+                              // Social Links
+                              if (profile!.socialLinks.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text('${entry.key}:'),
-                                      const SizedBox(width: 8),
-                                      Text(entry.value),
+                                      Text(
+                                        'Social Links',
+                                        style: Theme.of(context).textTheme.titleMedium,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      ...profile!.socialLinks.entries.map((entry) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 4),
+                                          child: Row(
+                                            children: [
+                                              Text('${entry.key}:'),
+                                              const SizedBox(width: 8),
+                                              Text(entry.value),
+                                            ],
+                                          ),
+                                        );
+                                      }),
                                     ],
                                   ),
-                                );
-                              }),
+                                ),
                             ],
                           ),
                         ),
-                    ],
-                  ),
-                ),
-      bottomNavigationBar: widget.showVideosTab
-          ? BottomNavigationBar(
-              items: const [
-                BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info'),
-                BottomNavigationBarItem(icon: Icon(Icons.video_library), label: 'Videos'),
-              ],
-            )
-          : null,
+                        // Videos Tab
+                        GridView.builder(
+                          padding: const EdgeInsets.all(16),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                          ),
+                          itemCount: profile!.totalVideos,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.video_library),
+                            );
+                          },
+                        ),
+                      ],
+                    )
+                  : SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // Profile Header
+                          Container(
+                            color: Colors.grey[100],
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 40,
+                                      backgroundImage: profile!.profileImageUrl != null
+                                          ? NetworkImage(profile!.profileImageUrl!)
+                                          : null,
+                                      child: profile!.profileImageUrl == null
+                                          ? Text(profile!.displayName[0].toUpperCase())
+                                          : null,
+                                    ),
+                                    const SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  profile!.displayName,
+                                                  style: Theme.of(context).textTheme.titleLarge,
+                                                ),
+                                              ),
+                                              if (profile!.isVerified)
+                                                const Icon(
+                                                  Icons.verified,
+                                                  color: Colors.blue,
+                                                  size: 20,
+                                                ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Row(
+                                            children: [
+                                              Text('Followers: ${profile!.followerCount}'),
+                                              const SizedBox(width: 16),
+                                              Text('Following: ${profile!.followingCount}'),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                if (profile!.bio != null && profile!.bio!.isNotEmpty)
+                                  Text(profile!.bio!),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    if (!widget.isOwnProfile && widget.currentUserId != null)
+                                      ElevatedButton.icon(
+                                        onPressed: toggleFollow,
+                                        icon: Icon(
+                                          isFollowing ? Icons.person_remove : Icons.person_add,
+                                        ),
+                                        label: Text(isFollowing ? 'Unfollow' : 'Follow'),
+                                      ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Statistics
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Statistics',
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 12),
+                                GridView.count(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 12,
+                                  crossAxisSpacing: 12,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  children: [
+                                    _StatCard(
+                                      label: 'Videos',
+                                      value: profile!.totalVideos.toString(),
+                                    ),
+                                    _StatCard(
+                                      label: 'Views',
+                                      value: '${(profile!.totalViews / 1000).toStringAsFixed(1)}K',
+                                    ),
+                                    _StatCard(
+                                      label: 'Likes',
+                                      value: '${(profile!.totalLikes / 1000).toStringAsFixed(1)}K',
+                                    ),
+                                    _StatCard(
+                                      label: 'Rating',
+                                      value: profile!.averageRating.toStringAsFixed(1),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Engagement Info
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Engagement',
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Text('Rate: ${profile!.getEngagementRate().toStringAsFixed(1)}%'),
+                                    const SizedBox(width: 24),
+                                    Text(
+                                      'Avg Views/Video: ${profile!.getAverageViewsPerVideo().toStringAsFixed(1)}',
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          // Badges
+                          if (profile!.badges.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Badges',
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Wrap(
+                                    spacing: 8,
+                                    children: profile!.badges.map((badge) {
+                                      return Chip(
+                                        avatar: const Icon(Icons.star),
+                                        label: Text(badge.name),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          // Social Links
+                          if (profile!.socialLinks.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Social Links',
+                                    style: Theme.of(context).textTheme.titleMedium,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  ...profile!.socialLinks.entries.map((entry) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
+                                      child: Row(
+                                        children: [
+                                          Text('${entry.key}:'),
+                                          const SizedBox(width: 8),
+                                          Text(entry.value),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
     );
   }
 }
