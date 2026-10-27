@@ -25,14 +25,12 @@ void main() {
       testWidgets('displays multiple badges', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: BadgeDisplay(
-                badges: [
-                  UserBadge.verified,
-                  UserBadge.topCreator,
-                  UserBadge.trendingSetter,
-                ],
-              ),
+            home: BadgeDisplay(
+              badges: [
+                UserBadge.verified,
+                UserBadge.topCreator,
+                UserBadge.trendingSetter,
+              ],
             ),
           ),
         );
@@ -69,8 +67,7 @@ void main() {
       testWidgets('displays all engagement metrics', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: EngagementMetrics(
+            home: EngagementMetrics(
                 views: 1000,
                 likes: 200,
                 shares: 50,
@@ -91,8 +88,7 @@ void main() {
       testWidgets('formats large numbers with K/M suffixes', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: EngagementMetrics(
+            home: EngagementMetrics(
                 views: 100000,
                 likes: 5000,
                 shares: 500,
@@ -110,8 +106,7 @@ void main() {
       testWidgets('shows engagement trend arrows', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: EngagementMetrics(
+            home: EngagementMetrics(
                 views: 1000,
                 likes: 200,
                 shares: 50,
@@ -129,8 +124,7 @@ void main() {
       testWidgets('metric icons display correctly', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: EngagementMetrics(
+            home: EngagementMetrics(
                 views: 1000,
                 likes: 200,
                 shares: 50,
@@ -161,9 +155,7 @@ void main() {
       testWidgets('displays 3.5 stars rating with half star', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: RatingDisplay(rating: 3.5, showHalfStars: true),
-            ),
+            home: RatingDisplay(rating: 3.5, showHalfStars: true),
           ),
         );
 
@@ -183,12 +175,10 @@ void main() {
       testWidgets('shows rating count and average', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: RatingDisplay(
-                rating: 4.5,
-                count: 120,
-                showCount: true,
-              ),
+            home: RatingDisplay(
+              rating: 4.5,
+              count: 120,
+              showCount: true,
             ),
           ),
         );
@@ -200,12 +190,10 @@ void main() {
       testWidgets('responds to tap for interactive rating', (WidgetTester tester) async {
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: RatingDisplay(
-                rating: 3.0,
-                onRatingChanged: (rating) {},
-                interactive: true,
-              ),
+            home: RatingDisplay(
+              rating: 3.0,
+              onRatingChanged: (rating) {},
+              interactive: true,
             ),
           ),
         );
@@ -255,8 +243,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: CommentCard(comment: comment, onExpand: () {}),
+            home: CommentCard(comment: comment, onExpand: () {}),
             ),
           ),
         );
@@ -279,8 +266,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: CommentCard(
+            home: CommentCard(
                 comment: comment,
                 onLike: () {},
               ),
@@ -363,8 +349,7 @@ void main() {
 
         await tester.pumpWidget(
           MaterialApp(
-            home: Scaffold(
-              body: UserCard(
+            home: UserCard(
                 profile: profile,
                 onFollowPressed: () {},
                 isFollowing: false,
